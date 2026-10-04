@@ -1,0 +1,2 @@
+Dataset,Best Model,Accuracy,Balanced Accuracy,Macro F1
+SEED,GCN,0.4474,0.445,0.4425
