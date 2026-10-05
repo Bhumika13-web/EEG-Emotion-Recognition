@@ -1,12 +1,7 @@
 import streamlit as st
-
 import numpy as np
-
 import pandas as pd
-
 import plotly.graph_objects as go
-
-from pathlib import Path
 
 
 # ============================================================
@@ -21,19 +16,10 @@ st.set_page_config(
 
 
 # ============================================================
-# PATHS
-# ============================================================
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
-PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
-
-
-# ============================================================
 # CONSTANTS
 # ============================================================
 
-CHANNELS = [
+DEAP_CHANNELS = [
     "FP1", "AF3", "F3", "F7",
     "FC5", "FC1", "C3", "T7",
     "CP5", "CP1", "P3", "P7",
@@ -44,6 +30,18 @@ CHANNELS = [
     "FP2", "FZ", "CZ", "PZ",
 ]
 
+SEED_CHANNELS = [
+    "FP1", "FPZ", "FP2",
+    "AF3", "AF4",
+    "F7", "F5", "F3", "F1", "FZ", "F2", "F4", "F6", "F8",
+    "FT7", "FC5", "FC3", "FC1", "FCZ", "FC2", "FC4", "FC6", "FT8",
+    "T7", "C5", "C3", "C1", "CZ", "C2", "C4", "C6", "T8",
+    "TP7", "CP5", "CP3", "CP1", "CPZ", "CP2", "CP4", "CP6", "TP8",
+    "P7", "P5", "P3", "P1", "PZ", "P2", "P4", "P6", "P8",
+    "PO7", "PO5", "PO3", "POZ", "PO4", "PO6", "PO8",
+    "O1", "OZ", "O2",
+    "CB1", "CB2",
+]
 
 BANDS = [
     "Delta",
@@ -53,8 +51,7 @@ BANDS = [
     "Gamma",
 ]
 
-
-FEATURE_NAMES = [
+DEAP_FEATURE_NAMES = [
     "DE - Delta",
     "DE - Theta",
     "DE - Alpha",
@@ -67,809 +64,1212 @@ FEATURE_NAMES = [
     "PSD - Gamma",
 ]
 
+DEAP_DE_INDICES = [0, 1, 2, 3, 4]
+DEAP_PSD_INDICES = [5, 6, 7, 8, 9]
 
-DE_INDICES = [0, 1, 2, 3, 4]
-
-PSD_INDICES = [5, 6, 7, 8, 9]
-
-
-# ============================================================
-# CUSTOM CSS
-# ============================================================
-
-st.markdown(
-    """
-<style>
-
-.feature-header {
-    padding: 25px;
-    border-radius: 18px;
-    background: linear-gradient(
-        135deg,
-        #0f172a,
-        #1e3a8a
-    );
-    color: white;
-    margin-bottom: 25px;
+SEED_EMOTION_MAP = {
+    0: "Negative",
+    1: "Neutral",
+    2: "Positive",
 }
-
-.feature-header-title {
-    font-size: 32px;
-    font-weight: 800;
-}
-
-.feature-header-text {
-    color: #cbd5e1;
-    margin-top: 8px;
-}
-
-.info-card {
-    background: var(--st-secondary-background-color);
-    border: 1px solid var(--st-border-color);
-    border-radius: 15px;
-    padding: 20px;
-    min-height: 120px;
-    box-shadow: 0 3px 12px rgba(15,23,42,0.05);
-}
-
-.info-title {
-    color: var(--st-text-color);
-    opacity: 0.7;
-    font-size: 13px;
-}
-
-.info-value {
-    color: var(--st-heading-color);
-    font-size: 26px;
-    font-weight: 800;
-    margin-top: 5px;
-}
-
-.section-title {
-    font-size: 24px;
-    font-weight: 750;
-    color: var(--st-heading-color);
-    margin-top: 30px;
-    margin-bottom: 12px;
-}
-
-</style>
-""",
-    unsafe_allow_html=True,
-)
 
 
 # ============================================================
 # HEADER
 # ============================================================
 
-st.markdown(
-    """
-<div class="feature-header">
+st.title("EEG Feature Analysis")
 
-<div class="feature-header-title">
- EEG Feature Analysis
-</div>
+st.write(
+    "Analysis of EEG feature representations across "
+    "frequency bands and EEG channels."
+)
 
-<div class="feature-header-text">
-Analysis of Differential Entropy (DE) and
-Power Spectral Density (PSD) features across
-EEG frequency bands and channels.
-</div>
+st.divider()
 
-</div>
-""",
-    unsafe_allow_html=True,
+
+# ============================================================
+# GET DATA FROM SESSION STATE
+# ============================================================
+
+features = st.session_state.get(
+    "processed_features",
+    None,
+)
+
+labels = st.session_state.get(
+    "processed_labels",
+    None,
+)
+
+subject_ids = st.session_state.get(
+    "processed_subject_ids",
+    None,
+)
+
+dataset_type = st.session_state.get(
+    "dataset_type",
+    None,
+)
+
+dataset_processed = st.session_state.get(
+    "dataset_processed",
+    False,
+)
+
+processed_source = st.session_state.get(
+    "processed_source",
+    None,
 )
 
 
 # ============================================================
-# LOAD DEAP
+# CHECK DATA
 # ============================================================
 
-@st.cache_data
-def load_deap():
+if (
+    not dataset_processed
+    or features is None
+    or dataset_type is None
+):
 
-    file_path = PROCESSED_DIR / "deap_train.npz"
+    st.warning(
+        "No processed EEG dataset is currently loaded."
+    )
 
-    if not file_path.exists():
-
-        return None
-
-    data = np.load(file_path)
-
-    return {
-        "features": data["features"],
-        "valence": data["valence"],
-        "arousal": data["arousal"],
-        "subjects": data["subject_ids"],
-        "trials": data["trial_ids"],
-    }
-
-
-data = load_deap()
-
-
-if data is None:
-
-    st.error(
-        "DEAP processed dataset was not found."
+    st.info(
+        "Please open **Upload Dataset**, select DEAP or SEED, "
+        "upload the required dataset, process it, and then "
+        "return to Feature Analysis."
     )
 
     st.stop()
 
 
-features = data["features"]
+# ============================================================
+# CONVERT TO NUMPY
+# ============================================================
 
-valence = data["valence"]
+features = np.asarray(features)
 
-arousal = data["arousal"]
+if labels is not None:
+    labels = np.asarray(labels)
 
-subjects = data["subjects"]
+if subject_ids is not None:
+    subject_ids = np.asarray(subject_ids)
 
-trials = data["trials"]
+dataset_type = str(
+    dataset_type
+).strip().upper()
 
 
 # ============================================================
-# DATA INFORMATION
+# CURRENT DATASET
 # ============================================================
 
-st.markdown(
-    '<div class="section-title">Feature Dataset</div>',
-    unsafe_allow_html=True,
-)
+st.header("Current Dataset")
 
+info1, info2, info3, info4 = st.columns(4)
 
-c1, c2, c3, c4 = st.columns(4)
-
-
-with c1:
-
-    st.markdown(
-        """
-<div class="info-card">
-<div class="info-title">Samples</div>
-<div class="info-value">960</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-with c2:
-
-    st.markdown(
-        """
-<div class="info-card">
-<div class="info-title">EEG Channels</div>
-<div class="info-value">32</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-with c3:
-
-    st.markdown(
-        """
-<div class="info-card">
-<div class="info-title">Windows / Sample</div>
-<div class="info-value">30</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-with c4:
-
-    st.markdown(
-        """
-<div class="info-card">
-<div class="info-title">Features / Channel</div>
-<div class="info-value">10</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-st.info(
-    "Representation: 30 temporal windows × 32 EEG channels × "
-    "10 features (5 Differential Entropy + 5 PSD)."
-)
-
-
-# ============================================================
-# SIDEBAR
-# ============================================================
-
-st.sidebar.header("Feature Controls")
-
-
-selected_subject = st.sidebar.selectbox(
-    "Select Subject",
-    sorted(
-        np.unique(subjects).tolist()
-    ),
-)
-
-
-subject_indices = np.where(
-    subjects == selected_subject
-)[0]
-
-
-selected_trial_number = st.sidebar.selectbox(
-    "Select Trial",
-    list(range(len(subject_indices))),
-)
-
-
-sample_index = subject_indices[
-    selected_trial_number
-]
-
-
-selected_window = st.sidebar.slider(
-    "Select Window",
-    min_value=0,
-    max_value=features.shape[1] - 1,
-    value=0,
-)
-
-
-sample = features[
-    sample_index
-]
-
-
-window_features = sample[
-    selected_window
-]
-
-
-# ============================================================
-# SELECTED SAMPLE
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Selected Sample</div>',
-    unsafe_allow_html=True,
-)
-
-
-sc1, sc2, sc3, sc4 = st.columns(4)
-
-
-with sc1:
-
+with info1:
     st.metric(
-        "Subject",
-        f"S{int(selected_subject) + 1:02d}",
+        "Dataset",
+        dataset_type,
     )
 
-
-with sc2:
-
+with info2:
     st.metric(
-        "Trial",
-        int(selected_trial_number) + 1,
+        "Samples / Trials",
+        f"{len(features):,}",
     )
 
-
-with sc3:
-
+with info3:
     st.metric(
-        "Window",
-        selected_window + 1,
+        "Representation",
+        str(features.shape[1:]),
+    )
+
+with info4:
+
+    if dataset_type == "DEAP":
+
+        st.metric(
+            "Channels",
+            32,
+        )
+
+    elif dataset_type == "SEED":
+
+        st.metric(
+            "Channels",
+            62,
+        )
+
+if processed_source:
+
+    st.caption(
+        f"Data source: {processed_source}"
     )
 
 
-with sc4:
+# ============================================================
+# ============================================================
+# DEAP FEATURE ANALYSIS
+# ============================================================
+# ============================================================
 
-    st.metric(
-        "Feature Vector",
-        "32 × 10",
+if dataset_type == "DEAP":
+
+    # --------------------------------------------------------
+    # NORMALIZE DEAP SHAPE
+    # --------------------------------------------------------
+
+    if features.ndim == 4:
+
+        if (
+            features.shape[2] == 32
+            and features.shape[3] == 10
+        ):
+
+            deap_features = features
+
+        else:
+
+            st.error(
+                "Unexpected DEAP feature shape. "
+                f"Received {features.shape}. "
+                "Expected (trials, windows, 32, 10)."
+            )
+
+            st.stop()
+
+    elif features.ndim == 3:
+
+        if features.shape[-1] == 320:
+
+            deap_features = features.reshape(
+                features.shape[0],
+                features.shape[1],
+                32,
+                10,
+            )
+
+        else:
+
+            st.error(
+                "Unexpected DEAP feature shape. "
+                f"Received {features.shape}. "
+                "Expected (..., 320) or (..., 32, 10)."
+            )
+
+            st.stop()
+
+    else:
+
+        st.error(
+            "Unexpected DEAP feature dimensions: "
+            f"{features.shape}"
+        )
+
+        st.stop()
+
+
+    # --------------------------------------------------------
+    # DEAP DATASET INFORMATION
+    # --------------------------------------------------------
+
+    trials = deap_features.shape[0]
+    windows = deap_features.shape[1]
+
+    st.header("DEAP Feature Dataset")
+
+    d1, d2, d3, d4 = st.columns(4)
+
+    with d1:
+
+        st.metric(
+            "Trials",
+            trials,
+        )
+
+    with d2:
+
+        st.metric(
+            "EEG Channels",
+            32,
+        )
+
+    with d3:
+
+        st.metric(
+            "Windows / Trial",
+            windows,
+        )
+
+    with d4:
+
+        st.metric(
+            "Features / Channel",
+            10,
+        )
+
+    st.info(
+        "DEAP representation: 30 temporal windows × "
+        "32 EEG channels × 10 features "
+        "(5 Differential Entropy + 5 PSD)."
     )
 
 
-# ============================================================
-# DE VS PSD OVERVIEW
-# ============================================================
+    # --------------------------------------------------------
+    # FEATURE CONTROLS
+    # --------------------------------------------------------
 
-st.markdown(
-    '<div class="section-title">DE vs PSD Overview</div>',
-    unsafe_allow_html=True,
-)
+    st.header("Feature Controls")
 
+    control1, control2 = st.columns(2)
 
-de_mean = sample[:, :, DE_INDICES].mean(
-    axis=(0, 1)
-)
+    with control1:
 
+        selected_trial = st.selectbox(
+            "Select Trial",
+            range(1, trials + 1),
+            key="feature_deap_trial",
+        )
 
-psd_mean = sample[:, :, PSD_INDICES].mean(
-    axis=(0, 1)
-)
+    with control2:
 
+        selected_window = st.selectbox(
+            "Select EEG Window",
+            range(1, windows + 1),
+            key="feature_deap_window",
+        )
 
-comparison_df = pd.DataFrame(
-    {
-        "Frequency Band": BANDS,
-        "Differential Entropy": de_mean,
-        "PSD": psd_mean,
-    }
-)
+    trial_index = selected_trial - 1
+    window_index = selected_window - 1
 
+    selected_trial_data = deap_features[
+        trial_index
+    ]
 
-fig = go.Figure()
-
-
-fig.add_trace(
-    go.Bar(
-        x=BANDS,
-        y=de_mean,
-        name="Differential Entropy",
-    )
-)
+    selected_window_data = deap_features[
+        trial_index,
+        window_index,
+    ]
 
 
-fig.add_trace(
-    go.Bar(
-        x=BANDS,
-        y=psd_mean,
-        name="PSD",
-    )
-)
+    # --------------------------------------------------------
+    # SELECTED SAMPLE
+    # --------------------------------------------------------
+
+    st.header("Selected Sample")
+
+    s1, s2, s3, s4 = st.columns(4)
+
+    with s1:
+
+        st.metric(
+            "Trial",
+            selected_trial,
+        )
+
+    with s2:
+
+        st.metric(
+            "Window",
+            selected_window,
+        )
+
+    with s3:
+
+        st.metric(
+            "Channels",
+            32,
+        )
+
+    with s4:
+
+        st.metric(
+            "Features",
+            10,
+        )
 
 
-fig.update_layout(
-    title="Average DE and PSD Across Frequency Bands",
-    xaxis_title="Frequency Band",
-    yaxis_title="Average Feature Value",
-    barmode="group",
-    height=480,
-)
+    # --------------------------------------------------------
+    # DE VS PSD
+    # --------------------------------------------------------
 
+    st.header("DE vs PSD Overview")
 
-st.plotly_chart(
-    fig,
-    use_container_width=True,
-)
-
-
-# ============================================================
-# DE ANALYSIS
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Differential Entropy Analysis</div>',
-    unsafe_allow_html=True,
-)
-
-
-de_values = sample[
-    :,
-    :,
-    DE_INDICES,
-]
-
-
-de_band_means = de_values.mean(
-    axis=(0, 1)
-)
-
-
-de_df = pd.DataFrame(
-    {
-        "Frequency Band": BANDS,
-        "Mean DE": de_band_means,
-    }
-)
-
-
-fig_de = go.Figure()
-
-
-fig_de.add_trace(
-    go.Bar(
-        x=de_df["Frequency Band"],
-        y=de_df["Mean DE"],
-        name="Differential Entropy",
-    )
-)
-
-
-fig_de.update_layout(
-    title="Differential Entropy by Frequency Band",
-    xaxis_title="Frequency Band",
-    yaxis_title="Mean DE",
-    height=420,
-)
-
-
-st.plotly_chart(
-    fig_de,
-    use_container_width=True,
-)
-
-
-# ============================================================
-# PSD ANALYSIS
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Power Spectral Density Analysis</div>',
-    unsafe_allow_html=True,
-)
-
-
-psd_values = sample[
-    :,
-    :,
-    PSD_INDICES,
-]
-
-
-psd_band_means = psd_values.mean(
-    axis=(0, 1)
-)
-
-
-psd_df = pd.DataFrame(
-    {
-        "Frequency Band": BANDS,
-        "Mean PSD": psd_band_means,
-    }
-)
-
-
-fig_psd = go.Figure()
-
-
-fig_psd.add_trace(
-    go.Bar(
-        x=psd_df["Frequency Band"],
-        y=psd_df["Mean PSD"],
-        name="PSD",
-    )
-)
-
-
-fig_psd.update_layout(
-    title="Power Spectral Density by Frequency Band",
-    xaxis_title="Frequency Band",
-    yaxis_title="Mean PSD",
-    height=420,
-)
-
-
-st.plotly_chart(
-    fig_psd,
-    use_container_width=True,
-)
-
-
-# ============================================================
-# CHANNEL × BAND HEATMAP
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Channel × Frequency Band Analysis</div>',
-    unsafe_allow_html=True,
-)
-
-
-feature_type = st.radio(
-    "Select Feature Type",
-    ["Differential Entropy", "PSD"],
-    horizontal=True,
-)
-
-
-if feature_type == "Differential Entropy":
-
-    selected_matrix = window_features[
+    de_mean = selected_trial_data[
         :,
-        DE_INDICES
-    ].T
-
-else:
-
-    selected_matrix = window_features[
         :,
-        PSD_INDICES
-    ].T
-
-
-heatmap = go.Figure(
-    data=go.Heatmap(
-        z=selected_matrix,
-        x=CHANNELS,
-        y=BANDS,
-        colorbar_title="Value",
+        DEAP_DE_INDICES,
+    ].mean(
+        axis=(0, 1)
     )
-)
 
-
-heatmap.update_layout(
-    title=(
-        f"{feature_type} "
-        f"Window {selected_window + 1}"
-    ),
-    xaxis_title="EEG Channel",
-    yaxis_title="Frequency Band",
-    height=520,
-)
-
-
-st.plotly_chart(
-    heatmap,
-    use_container_width=True,
-)
-
-
-# ============================================================
-# CHANNEL ANALYSIS
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Channel Analysis</div>',
-    unsafe_allow_html=True,
-)
-
-
-channel_feature_type = st.selectbox(
-    "Channel Feature",
-    FEATURE_NAMES,
-)
-
-
-feature_index = FEATURE_NAMES.index(
-    channel_feature_type
-)
-
-
-channel_values = sample[
-    :,
-    :,
-    feature_index
-].mean(axis=0)
-
-
-channel_df = pd.DataFrame(
-    {
-        "Channel": CHANNELS,
-        "Mean Value": channel_values,
-    }
-)
-
-
-channel_df_sorted = channel_df.sort_values(
-    "Mean Value",
-    ascending=False,
-)
-
-
-fig_channel = go.Figure()
-
-
-fig_channel.add_trace(
-    go.Bar(
-        x=channel_df_sorted["Channel"],
-        y=channel_df_sorted["Mean Value"],
+    psd_mean = selected_trial_data[
+        :,
+        :,
+        DEAP_PSD_INDICES,
+    ].mean(
+        axis=(0, 1)
     )
-)
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Bar(
+            x=BANDS,
+            y=de_mean,
+            name="Differential Entropy",
+        )
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=BANDS,
+            y=psd_mean,
+            name="PSD",
+        )
+    )
+
+    fig.update_layout(
+        title="Average DE and PSD Across Frequency Bands",
+        xaxis_title="Frequency Band",
+        yaxis_title="Average Feature Value",
+        barmode="group",
+        height=480,
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+    )
 
 
-fig_channel.update_layout(
-    title=f"Average {channel_feature_type} by EEG Channel",
-    xaxis_title="EEG Channel",
-    yaxis_title="Mean Value",
-    height=500,
-)
+    # --------------------------------------------------------
+    # DIFFERENTIAL ENTROPY
+    # --------------------------------------------------------
 
+    st.header("Differential Entropy Analysis")
 
-st.plotly_chart(
-    fig_channel,
-    use_container_width=True,
-)
-
-
-# ============================================================
-# EMOTION GROUP ANALYSIS
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Feature vs Emotion</div>',
-    unsafe_allow_html=True,
-)
-
-
-emotion_feature = st.selectbox(
-    "Select Feature",
-    FEATURE_NAMES,
-)
-
-
-emotion_feature_index = FEATURE_NAMES.index(
-    emotion_feature
-)
-
-
-sample_values = features[
-    :,
-    :,
-    :,
-    emotion_feature_index
-].mean(axis=(1, 2))
-
-
-emotion_df = pd.DataFrame(
-    {
-        "Value": sample_values,
-        "Valence": valence,
-        "Arousal": arousal,
-    }
-)
-
-
-emotion_df["Valence Group"] = np.where(
-    emotion_df["Valence"] == 1,
-    "High Valence",
-    "Low Valence",
-)
-
-
-emotion_df["Arousal Group"] = np.where(
-    emotion_df["Arousal"] == 1,
-    "High Arousal",
-    "Low Arousal",
-)
-
-
-emotion_view = st.radio(
-    "Compare By",
-    ["Valence", "Arousal"],
-    horizontal=True,
-)
-
-
-if emotion_view == "Valence":
-
-    groups = [
-        "Low Valence",
-        "High Valence",
+    de_values = selected_trial_data[
+        :,
+        :,
+        DEAP_DE_INDICES,
     ]
 
-    values = [
-        emotion_df.loc[
-            emotion_df["Valence Group"] == group,
-            "Value",
-        ].mean()
-        for group in groups
+    de_band_means = de_values.mean(
+        axis=(0, 1)
+    )
+
+    fig_de = go.Figure()
+
+    fig_de.add_trace(
+        go.Bar(
+            x=BANDS,
+            y=de_band_means,
+            name="Differential Entropy",
+        )
+    )
+
+    fig_de.update_layout(
+        title="Differential Entropy by Frequency Band",
+        xaxis_title="Frequency Band",
+        yaxis_title="Mean DE",
+        height=420,
+    )
+
+    st.plotly_chart(
+        fig_de,
+        use_container_width=True,
+    )
+
+
+    # --------------------------------------------------------
+    # PSD
+    # --------------------------------------------------------
+
+    st.header("Power Spectral Density Analysis")
+
+    psd_values = selected_trial_data[
+        :,
+        :,
+        DEAP_PSD_INDICES,
     ]
 
-else:
+    psd_band_means = psd_values.mean(
+        axis=(0, 1)
+    )
 
-    groups = [
-        "Low Arousal",
-        "High Arousal",
-    ]
+    fig_psd = go.Figure()
 
-    values = [
-        emotion_df.loc[
-            emotion_df["Arousal Group"] == group,
-            "Value",
-        ].mean()
-        for group in groups
-    ]
+    fig_psd.add_trace(
+        go.Bar(
+            x=BANDS,
+            y=psd_band_means,
+            name="PSD",
+        )
+    )
+
+    fig_psd.update_layout(
+        title="Power Spectral Density by Frequency Band",
+        xaxis_title="Frequency Band",
+        yaxis_title="Mean PSD",
+        height=420,
+    )
+
+    st.plotly_chart(
+        fig_psd,
+        use_container_width=True,
+    )
 
 
-fig_emotion = go.Figure()
+    # --------------------------------------------------------
+    # CHANNEL × FREQUENCY HEATMAP
+    # --------------------------------------------------------
 
+    st.header("Channel × Frequency Band Heatmap")
 
-fig_emotion.add_trace(
-    go.Bar(
-        x=groups,
-        y=values,
-        text=[
-            f"{value:.4f}"
-            for value in values
+    heatmap_type = st.selectbox(
+        "Select Feature Type",
+        [
+            "Differential Entropy",
+            "PSD",
         ],
-        textposition="auto",
+        key="deap_heatmap_type",
     )
-)
+
+    if heatmap_type == "Differential Entropy":
+
+        matrix = selected_window_data[
+            :,
+            DEAP_DE_INDICES,
+        ].T
+
+    else:
+
+        matrix = selected_window_data[
+            :,
+            DEAP_PSD_INDICES,
+        ].T
+
+    heatmap = go.Figure(
+        data=go.Heatmap(
+            z=matrix,
+            x=DEAP_CHANNELS,
+            y=BANDS,
+            colorbar_title="Value",
+        )
+    )
+
+    heatmap.update_layout(
+        title=(
+            f"{heatmap_type} — "
+            f"Window {selected_window}"
+        ),
+        xaxis_title="EEG Channel",
+        yaxis_title="Frequency Band",
+        height=520,
+    )
+
+    st.plotly_chart(
+        heatmap,
+        use_container_width=True,
+    )
 
 
-fig_emotion.update_layout(
-    title=(
-        f"{emotion_feature} vs "
-        f"{emotion_view}"
-    ),
-    xaxis_title=emotion_view,
-    yaxis_title="Average Feature Value",
-    height=430,
-)
+    # --------------------------------------------------------
+    # CHANNEL ANALYSIS
+    # --------------------------------------------------------
 
+    st.header("Channel Analysis")
 
-st.plotly_chart(
-    fig_emotion,
-    use_container_width=True,
-)
+    channel_feature = st.selectbox(
+        "Select Feature",
+        DEAP_FEATURE_NAMES,
+        key="deap_channel_feature",
+    )
 
+    feature_index = DEAP_FEATURE_NAMES.index(
+        channel_feature
+    )
 
-# ============================================================
-# FEATURE STATISTICS TABLE
-# ============================================================
-
-st.markdown(
-    '<div class="section-title">Feature Statistics</div>',
-    unsafe_allow_html=True,
-)
-
-
-stats_rows = []
-
-
-for i, name in enumerate(FEATURE_NAMES):
-
-    values = features[
+    channel_values = selected_trial_data[
         :,
         :,
-        :,
-        i
-    ].flatten()
+        feature_index,
+    ].mean(
+        axis=0
+    )
 
-    stats_rows.append(
+    channel_df = pd.DataFrame(
         {
-            "Feature": name,
-            "Mean": np.mean(values),
-            "Std": np.std(values),
-            "Minimum": np.min(values),
-            "Maximum": np.max(values),
-            "Median": np.median(values),
+            "Channel": DEAP_CHANNELS,
+            "Mean Value": channel_values,
         }
     )
 
+    channel_df = channel_df.sort_values(
+        "Mean Value",
+        ascending=False,
+    )
 
-stats_df = pd.DataFrame(
-    stats_rows
-)
+    fig_channel = go.Figure()
+
+    fig_channel.add_trace(
+        go.Bar(
+            x=channel_df["Channel"],
+            y=channel_df["Mean Value"],
+        )
+    )
+
+    fig_channel.update_layout(
+        title=f"Average {channel_feature} by EEG Channel",
+        xaxis_title="EEG Channel",
+        yaxis_title="Mean Value",
+        height=500,
+    )
+
+    st.plotly_chart(
+        fig_channel,
+        use_container_width=True,
+    )
 
 
-display_stats = stats_df.copy()
+    # --------------------------------------------------------
+    # FEATURE VS EMOTION
+    # --------------------------------------------------------
+
+    if labels is not None:
+
+        labels_array = np.asarray(
+            labels
+        )
+
+        if (
+            labels_array.ndim >= 2
+            and len(labels_array) == trials
+            and labels_array.shape[1] >= 2
+        ):
+
+            st.header("Feature vs Emotion")
+
+            emotion_feature = st.selectbox(
+                "Select Feature",
+                DEAP_FEATURE_NAMES,
+                key="deap_emotion_feature",
+            )
+
+            emotion_feature_index = (
+                DEAP_FEATURE_NAMES.index(
+                    emotion_feature
+                )
+            )
+
+            feature_values = deap_features[
+                :,
+                :,
+                :,
+                emotion_feature_index,
+            ].mean(
+                axis=(1, 2)
+            )
+
+            raw_valence = labels_array[:, 0]
+            raw_arousal = labels_array[:, 1]
+
+            # ------------------------------------------------
+            # VALENCE GROUP
+            # ------------------------------------------------
+
+            if np.all(
+                np.isin(
+                    np.unique(raw_valence),
+                    [0, 1],
+                )
+            ):
+
+                valence_group = np.where(
+                    raw_valence == 1,
+                    "High Valence",
+                    "Low Valence",
+                )
+
+            else:
+
+                valence_group = np.where(
+                    raw_valence >= 5.0,
+                    "High Valence",
+                    "Low Valence",
+                )
 
 
-for column in [
-    "Mean",
-    "Std",
-    "Minimum",
-    "Maximum",
-    "Median",
-]:
+            # ------------------------------------------------
+            # AROUSAL GROUP
+            # ------------------------------------------------
 
-    display_stats[column] = display_stats[
-        column
-    ].round(4)
+            if np.all(
+                np.isin(
+                    np.unique(raw_arousal),
+                    [0, 1],
+                )
+            ):
+
+                arousal_group = np.where(
+                    raw_arousal == 1,
+                    "High Arousal",
+                    "Low Arousal",
+                )
+
+            else:
+
+                arousal_group = np.where(
+                    raw_arousal >= 5.0,
+                    "High Arousal",
+                    "Low Arousal",
+                )
 
 
-st.dataframe(
-    display_stats,
-    use_container_width=True,
-    hide_index=True,
-)
+            emotion_view = st.radio(
+                "Compare By",
+                [
+                    "Valence",
+                    "Arousal",
+                ],
+                horizontal=True,
+                key="deap_emotion_view",
+            )
+
+
+            if emotion_view == "Valence":
+
+                groups = [
+                    "Low Valence",
+                    "High Valence",
+                ]
+
+                group_values = []
+
+                for group in groups:
+
+                    mask = (
+                        valence_group == group
+                    )
+
+                    if np.any(mask):
+
+                        group_values.append(
+                            float(
+                                np.mean(
+                                    feature_values[
+                                        mask
+                                    ]
+                                )
+                            )
+                        )
+
+                    else:
+
+                        group_values.append(
+                            np.nan
+                        )
+
+            else:
+
+                groups = [
+                    "Low Arousal",
+                    "High Arousal",
+                ]
+
+                group_values = []
+
+                for group in groups:
+
+                    mask = (
+                        arousal_group == group
+                    )
+
+                    if np.any(mask):
+
+                        group_values.append(
+                            float(
+                                np.mean(
+                                    feature_values[
+                                        mask
+                                    ]
+                                )
+                            )
+                        )
+
+                    else:
+
+                        group_values.append(
+                            np.nan
+                        )
+
+
+            fig_emotion = go.Figure()
+
+            fig_emotion.add_trace(
+                go.Bar(
+                    x=groups,
+                    y=group_values,
+                    text=[
+                        (
+                            f"{value:.4f}"
+                            if np.isfinite(value)
+                            else "N/A"
+                        )
+                        for value in group_values
+                    ],
+                    textposition="auto",
+                )
+            )
+
+            fig_emotion.update_layout(
+                title=(
+                    f"{emotion_feature} vs "
+                    f"{emotion_view}"
+                ),
+                xaxis_title=emotion_view,
+                yaxis_title="Average Feature Value",
+                height=430,
+            )
+
+            st.plotly_chart(
+                fig_emotion,
+                use_container_width=True,
+            )
+
+
+    # --------------------------------------------------------
+    # FEATURE STATISTICS
+    # --------------------------------------------------------
+
+    st.header("Feature Statistics")
+
+    statistics = []
+
+    for index, feature_name in enumerate(
+        DEAP_FEATURE_NAMES
+    ):
+
+        values = deap_features[
+            :,
+            :,
+            :,
+            index,
+        ]
+
+        statistics.append(
+            {
+                "Feature": feature_name,
+                "Mean": float(
+                    np.mean(values)
+                ),
+                "Std": float(
+                    np.std(values)
+                ),
+                "Minimum": float(
+                    np.min(values)
+                ),
+                "Maximum": float(
+                    np.max(values)
+                ),
+            }
+        )
+
+    stats_df = pd.DataFrame(
+        statistics
+    )
+
+    st.dataframe(
+        stats_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+# ============================================================
+# ============================================================
+# SEED FEATURE ANALYSIS
+# ============================================================
+# ============================================================
+
+elif dataset_type == "SEED":
+
+    # --------------------------------------------------------
+    # VALIDATE SEED
+    # --------------------------------------------------------
+
+    if features.ndim != 3:
+
+        st.error(
+            "Unexpected SEED feature shape. "
+            f"Received {features.shape}. "
+            "Expected (samples, 5, 62)."
+        )
+
+        st.stop()
+
+
+    if features.shape[1:] != (
+        5,
+        62,
+    ):
+
+        st.error(
+            "Unexpected SEED representation. "
+            f"Received {features.shape}. "
+            "Expected (samples, 5, 62)."
+        )
+
+        st.stop()
+
+
+    samples = features.shape[0]
+
+
+    # --------------------------------------------------------
+    # SEED DATASET INFORMATION
+    # --------------------------------------------------------
+
+    st.header("SEED Feature Dataset")
+
+    s1, s2, s3, s4 = st.columns(4)
+
+    with s1:
+
+        st.metric(
+            "Samples",
+            f"{samples:,}",
+        )
+
+    with s2:
+
+        st.metric(
+            "Frequency Bands",
+            5,
+        )
+
+    with s3:
+
+        st.metric(
+            "EEG Channels",
+            62,
+        )
+
+    with s4:
+
+        st.metric(
+            "Emotion Classes",
+            3,
+        )
+
+    st.info(
+        "SEED representation: 5 frequency-band features "
+        "× 62 EEG channels. The uploaded SEED representation "
+        "is already provided as Differential Entropy features."
+    )
+
+
+    # --------------------------------------------------------
+    # FEATURE CONTROLS
+    # --------------------------------------------------------
+
+    st.header("Feature Controls")
+
+    selected_sample_number = st.selectbox(
+        "Select SEED Sample",
+        range(
+            1,
+            samples + 1,
+        ),
+        key="feature_seed_sample",
+    )
+
+    sample_index = (
+        selected_sample_number - 1
+    )
+
+    selected_sample = features[
+        sample_index
+    ]
+
+
+    # --------------------------------------------------------
+    # SUBJECT INFORMATION
+    # --------------------------------------------------------
+
+    subject_value = None
+
+    if (
+        subject_ids is not None
+        and len(subject_ids) == samples
+    ):
+
+        subject_value = int(
+            subject_ids[
+                sample_index
+            ]
+        )
+
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+
+        st.metric(
+            "Sample",
+            selected_sample_number,
+        )
+
+    with c2:
+
+        if subject_value is not None:
+
+            st.metric(
+                "Subject",
+                subject_value,
+            )
+
+        else:
+
+            st.metric(
+                "Subject",
+                "Available in upload",
+            )
+
+    with c3:
+
+        st.metric(
+            "Input Shape",
+            "5 × 62",
+        )
+
+
+    # --------------------------------------------------------
+    # REFERENCE EMOTION
+    # --------------------------------------------------------
+
+    if (
+        labels is not None
+        and len(labels) == samples
+    ):
+
+        label_value = int(
+            np.asarray(
+                labels
+            ).reshape(-1)[
+                sample_index
+            ]
+        )
+
+        emotion = SEED_EMOTION_MAP.get(
+            label_value,
+            f"Class {label_value}",
+        )
+
+        st.header("Reference Emotion")
+
+        e1, e2 = st.columns(2)
+
+        with e1:
+
+            st.metric(
+                "Emotion",
+                emotion,
+            )
+
+        with e2:
+
+            st.metric(
+                "Class",
+                label_value,
+            )
+
+
+    # --------------------------------------------------------
+    # FREQUENCY BAND ANALYSIS
+    # --------------------------------------------------------
+
+    st.header("Frequency Band Analysis")
+
+    band_values = selected_sample.mean(
+        axis=1
+    )
+
+    band_df = pd.DataFrame(
+        {
+            "Frequency Band": BANDS,
+            "Mean DE": band_values,
+        }
+    )
+
+    fig_band = go.Figure()
+
+    fig_band.add_trace(
+        go.Bar(
+            x=BANDS,
+            y=band_values,
+            name="Differential Entropy",
+        )
+    )
+
+    fig_band.update_layout(
+        title="Average Differential Entropy by Frequency Band",
+        xaxis_title="Frequency Band",
+        yaxis_title="Mean DE",
+        height=430,
+    )
+
+    st.plotly_chart(
+        fig_band,
+        use_container_width=True,
+    )
+
+
+    # --------------------------------------------------------
+    # BAND × CHANNEL HEATMAP
+    # --------------------------------------------------------
+
+    st.header("Frequency Band × EEG Channel")
+
+    heatmap = go.Figure(
+        data=go.Heatmap(
+            z=selected_sample,
+            x=SEED_CHANNELS,
+            y=BANDS,
+            colorbar_title="DE",
+        )
+    )
+
+    heatmap.update_layout(
+        title="SEED Differential Entropy Heatmap",
+        xaxis_title="EEG Channel",
+        yaxis_title="Frequency Band",
+        height=540,
+    )
+
+    st.plotly_chart(
+        heatmap,
+        use_container_width=True,
+    )
+
+
+    # --------------------------------------------------------
+    # CHANNEL ANALYSIS
+    # --------------------------------------------------------
+
+    st.header("Channel Analysis")
+
+    channel_values = selected_sample.mean(
+        axis=0
+    )
+
+    channel_df = pd.DataFrame(
+        {
+            "Channel": SEED_CHANNELS,
+            "Mean DE": channel_values,
+        }
+    )
+
+    channel_df = channel_df.sort_values(
+        "Mean DE",
+        ascending=False,
+    )
+
+    fig_channel = go.Figure()
+
+    fig_channel.add_trace(
+        go.Bar(
+            x=channel_df["Channel"],
+            y=channel_df["Mean DE"],
+        )
+    )
+
+    fig_channel.update_layout(
+        title="Average Differential Entropy by EEG Channel",
+        xaxis_title="EEG Channel",
+        yaxis_title="Mean DE",
+        height=500,
+    )
+
+    st.plotly_chart(
+        fig_channel,
+        use_container_width=True,
+    )
+
+
+    # --------------------------------------------------------
+    # FEATURE STATISTICS
+    # --------------------------------------------------------
+
+    st.header("Feature Statistics")
+
+    seed_statistics = []
+
+    for band_index, band_name in enumerate(
+        BANDS
+    ):
+
+        values = features[
+            :,
+            band_index,
+            :,
+        ]
+
+        seed_statistics.append(
+            {
+                "Frequency Band": band_name,
+                "Mean": float(
+                    np.mean(values)
+                ),
+                "Std": float(
+                    np.std(values)
+                ),
+                "Minimum": float(
+                    np.min(values)
+                ),
+                "Maximum": float(
+                    np.max(values)
+                ),
+            }
+        )
+
+    seed_stats_df = pd.DataFrame(
+        seed_statistics
+    )
+
+    st.dataframe(
+        seed_stats_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+# ============================================================
+# INVALID DATASET
+# ============================================================
+
+else:
+
+    st.error(
+        f"Unsupported dataset type: {dataset_type}"
+    )
+
+    st.stop()
 
 
 # ============================================================
 # FOOTER
 # ============================================================
 
-st.markdown("---")
-
+st.divider()
 
 st.caption(
-    "Feature Analysis · DEAP · Differential Entropy + PSD"
+    "EEG based Emotion Recognition using "
+    "Spatial-Temporal Representation Learning"
 )
