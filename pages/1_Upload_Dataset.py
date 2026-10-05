@@ -14,7 +14,7 @@ from scipy.signal import butter, sosfiltfilt, welch
 
 st.set_page_config(
     page_title="Upload Dataset",
-    page_icon="ðŸ§ ",
+    page_icon="🧠",
     layout="wide",
 )
 
@@ -238,7 +238,7 @@ with dataset_col1:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                ðŸ§  DEAP
+                🧠 DEAP
             </div>
 
             <div class="dataset-text">
@@ -271,7 +271,7 @@ with dataset_col2:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                ðŸ§  SEED
+                🧠 SEED
             </div>
 
             <div class="dataset-text">
