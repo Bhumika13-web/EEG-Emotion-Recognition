@@ -265,9 +265,9 @@ def check_subject_split():
     print("Validation subjects:", sorted(val))
     print("Test subjects:", sorted(test))
 
-    print("\nTrain ∩ Validation:", train & val)
-    print("Train ∩ Test:", train & test)
-    print("Validation ∩ Test:", val & test)
+    print("\nTrain  Validation:", train & val)
+    print("Train  Test:", train & test)
+    print("Validation  Test:", val & test)
 
     all_subjects = train | val | test
 
@@ -277,10 +277,10 @@ def check_subject_split():
     )
 
     if len(all_subjects) == 32:
-        print("✓ All 32 DEAP subjects are included.")
+        print(" All 32 DEAP subjects are included.")
 
     if not (train & val or train & test or val & test):
-        print("✓ No subject overlap detected.")
+        print(" No subject overlap detected.")
 
     print("\nSplit sizes:")
     print(f"Train: {len(train)} subjects")

@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # -------------------------------------------------
 
     # One EEG window:
-    # 32 electrodes × 10 features
+    # 32 electrodes  10 features
     x = torch.randn(
         32,
         10,

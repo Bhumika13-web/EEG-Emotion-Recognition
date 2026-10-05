@@ -12,13 +12,13 @@ Input:
 
 Architecture:
     EEG features
-        ↓
+        
     GCN
-        ↓
+        
     Spatial representation
-        ↓
+        
     GRU
-        ↓
+        
     Emotion classifier
 
 Classes:
@@ -287,12 +287,12 @@ class SEEDSequenceDataset(Dataset):
 
         Therefore a sequence never crosses:
 
-            Subject A → Subject B
+            Subject A  Subject B
 
         or:
 
-            Negative → Neutral
-            Neutral → Positive
+            Negative  Neutral
+            Neutral  Positive
             etc.
 
         This is important because the GRU should receive
@@ -772,7 +772,7 @@ class SEEDGCNGRU(
         """
         Input:
 
-            B × T × 5 × 62
+            B  T  5  62
 
         B = batch size
         T = sequence length
@@ -805,11 +805,11 @@ class SEEDGCNGRU(
         # ----------------------------------------------------
         # Rearrange:
         #
-        # B × T × F × N
+        # B  T  F  N
         #
-        # →
+        # 
         #
-        # B × T × N × F
+        # B  T  N  F
         # ----------------------------------------------------
 
         x = x.permute(
@@ -822,11 +822,11 @@ class SEEDGCNGRU(
         # ----------------------------------------------------
         # Flatten B and T
         #
-        # B × T × N × F
+        # B  T  N  F
         #
-        # →
+        # 
         #
-        # B*T*N × F
+        # B*T*N  F
         # ----------------------------------------------------
 
         x = x.reshape(
@@ -873,11 +873,11 @@ class SEEDGCNGRU(
         # ----------------------------------------------------
         # Restore node dimension
         #
-        # B*T*N × 64
+        # B*T*N  64
         #
-        # →
+        # 
         #
-        # B*T × N × 64
+        # B*T  N  64
         # ----------------------------------------------------
 
         x = x.reshape(
@@ -889,11 +889,11 @@ class SEEDGCNGRU(
         # ----------------------------------------------------
         # Spatial mean pooling
         #
-        # B*T × N × 64
+        # B*T  N  64
         #
-        # →
+        # 
         #
-        # B*T × 64
+        # B*T  64
         # ----------------------------------------------------
 
         x = x.mean(
@@ -903,11 +903,11 @@ class SEEDGCNGRU(
         # ----------------------------------------------------
         # Restore temporal dimension
         #
-        # B*T × 64
+        # B*T  64
         #
-        # →
+        # 
         #
-        # B × T × 64
+        # B  T  64
         # ----------------------------------------------------
 
         x = x.reshape(
@@ -1106,7 +1106,7 @@ def calculate_metrics(
     macro_f1 = f1_score(
         y_true,
         y_pred,
-        average="macro",
+        average="macr,
         zero_division=0,
     )
 
@@ -1121,7 +1121,7 @@ def calculate_metrics(
         precision_score(
             y_true,
             y_pred,
-            average="macro",
+            average="macr,
             zero_division=0,
         )
     )
@@ -1129,7 +1129,7 @@ def calculate_metrics(
     macro_recall = recall_score(
         y_true,
         y_pred,
-        average="macro",
+        average="macr,
         zero_division=0,
     )
 
@@ -1454,7 +1454,7 @@ for epoch in range(
         )
 
         print(
-            "✓ Best model saved."
+            " Best model saved."
         )
 
     else:
@@ -1756,5 +1756,5 @@ print(
 )
 
 print(
-    "\n✓ Training and evaluation finished."
+    "\n Training and evaluation finished."
 )

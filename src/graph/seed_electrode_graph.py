@@ -74,7 +74,7 @@ assert len(SEED_CHANNELS) == 62, (
 )
 
 print()
-print("✓ Channel list contains exactly 62 electrodes.")
+print(" Channel list contains exactly 62 electrodes.")
 
 
 # ============================================================
@@ -175,7 +175,7 @@ if missing:
 
 assert len(SEED_POSITIONS) == 62
 
-print("✓ All 62 electrodes have positions.")
+print(" All 62 electrodes have positions.")
 
 
 # ============================================================
@@ -294,32 +294,32 @@ assert np.all(
 )
 
 
-print("✓ Nodes:              62")
+print(" Nodes:              62")
 print(
-    f"✓ Adjacency shape:    {adjacency.shape}"
+    f" Adjacency shape:    {adjacency.shape}"
 )
 print(
-    f"✓ Normalized shape:   {normalized_adjacency.shape}"
+    f" Normalized shape:   {normalized_adjacency.shape}"
 )
 print(
-    f"✓ Coordinates:        {coordinates.shape}"
+    f" Coordinates:        {coordinates.shape}"
 )
 print(
-    f"✓ Edge index shape:   {tuple(edge_index.shape)}"
+    f" Edge index shape:   {tuple(edge_index.shape)}"
 )
 
 print(
-    f"✓ Undirected edges:   "
+    f" Undirected edges:   "
     f"{int(adjacency.sum() / 2)}"
 )
 
 print(
-    f"✓ Total graph edges:  "
+    f" Total graph edges:  "
     f"{edge_index.shape[1]}"
 )
 
-print("✓ Graph is symmetric")
-print("✓ Self-loops present")
+print(" Graph is symmetric")
+print(" Self-loops present")
 
 
 # ============================================================

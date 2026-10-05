@@ -2,18 +2,16 @@ import streamlit as st
 from pathlib import Path
 import pandas as pd
 
-
 # ============================================================
 # PAGE CONFIGURATION
 # ============================================================
 
 st.set_page_config(
     page_title="EEG Emotion Recognition",
-    page_icon="🧠",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
 
 # ============================================================
 # SESSION STATE
@@ -40,7 +38,6 @@ if "processed_labels" not in st.session_state:
 if "dataset_info" not in st.session_state:
     st.session_state.dataset_info = {}
 
-
 # ============================================================
 # CUSTOM CSS
 # ============================================================
@@ -61,7 +58,6 @@ st.markdown(
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
-
 
 /* ============================================================
    SIDEBAR
@@ -107,7 +103,6 @@ st.markdown(
     background-color: rgba(59, 130, 246, 0.12);
 }
 
-
 /* ============================================================
    HERO
    ============================================================ */
@@ -143,7 +138,6 @@ st.markdown(
     font-size: 15px;
 }
 
-
 /* ============================================================
    SECTION TITLES
    ============================================================ */
@@ -155,7 +149,6 @@ st.markdown(
     margin-top: 30px;
     margin-bottom: 15px;
 }
-
 
 /* ============================================================
    METRIC CARDS
@@ -191,7 +184,6 @@ st.markdown(
     margin-top: 6px;
 }
 
-
 /* ============================================================
    PIPELINE
    ============================================================ */
@@ -226,7 +218,6 @@ st.markdown(
     margin-top: 5px;
 }
 
-
 /* ============================================================
    DATASET CARDS
    ============================================================ */
@@ -254,7 +245,6 @@ st.markdown(
     font-size: 15px;
 }
 
-
 /* ============================================================
    BEST MODEL
    ============================================================ */
@@ -266,7 +256,6 @@ st.markdown(
     padding: 25px;
     margin-top: 10px;
 }
-
 
 /* ============================================================
    PROJECT STATUS
@@ -281,7 +270,6 @@ st.markdown(
     min-height: 90px;
 }
 
-
 /* ============================================================
    FOOTER
    ============================================================ */
@@ -294,7 +282,6 @@ st.markdown(
     opacity: 0.70;
     font-size: 13px;
 }
-
 
 /* ============================================================
    STREAMLIT COMPONENTS
@@ -322,7 +309,6 @@ hr {
     unsafe_allow_html=True,
 )
 
-
 # ============================================================
 # SIDEBAR
 # ============================================================
@@ -332,7 +318,7 @@ with st.sidebar:
     st.html(
         """
         <div class="sidebar-brand">
-            🧠 EEG Lab
+            EEG Lab
         </div>
 
         <div class="sidebar-subtitle">
@@ -358,7 +344,7 @@ with st.sidebar:
     st.page_link(
         "app.py",
         label="Dashboard",
-        icon="🏠",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -368,7 +354,7 @@ with st.sidebar:
     st.page_link(
         "pages/1_Upload_Dataset.py",
         label="Upload Dataset",
-        icon="📤",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -378,7 +364,7 @@ with st.sidebar:
     st.page_link(
         "pages/2_EEG_Visualization.py",
         label="EEG Visualization",
-        icon="🧠",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -388,7 +374,7 @@ with st.sidebar:
     st.page_link(
         "pages/3_Feature_Analysis.py",
         label="Feature Analysis",
-        icon="📊",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -398,7 +384,7 @@ with st.sidebar:
     st.page_link(
         "pages/4_Emotion_Prediction.py",
         label="Emotion Prediction",
-        icon="🎭",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -408,7 +394,7 @@ with st.sidebar:
     st.page_link(
         "pages/5_Model_Architecture.py",
         label="Model Architecture",
-        icon="🏗️",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -418,7 +404,7 @@ with st.sidebar:
     st.page_link(
         "pages/6_Evaluation.py",
         label="Evaluation",
-        icon="📈",
+        icon="",
     )
 
     st.divider()
@@ -428,7 +414,6 @@ with st.sidebar:
         "Spatial-Temporal Representation Learning"
     )
 
-
 # ============================================================
 # HERO
 # ============================================================
@@ -436,9 +421,8 @@ with st.sidebar:
 st.html(
     """
     <div class="hero">
-
         <div class="hero-title">
-            🧠 EEG Emotion Recognition
+            EEG Emotion Recognition
         </div>
 
         <div class="hero-subtitle">
@@ -447,18 +431,16 @@ st.html(
         </div>
 
         <div class="hero-tech">
-            DEAP &nbsp;•&nbsp;
-            SEED &nbsp;•&nbsp;
-            Differential Entropy &nbsp;•&nbsp;
-            PSD &nbsp;•&nbsp;
-            GCN &nbsp;•&nbsp;
+            DEAP &nbsp;&nbsp;
+            SEED &nbsp;&nbsp;
+            Differential Entropy &nbsp;&nbsp;
+            PSD &nbsp;&nbsp;
+            GCN &nbsp;&nbsp;
             GRU
         </div>
-
     </div>
     """
 )
-
 
 # ============================================================
 # PROJECT OVERVIEW
@@ -473,7 +455,6 @@ st.html(
 )
 
 col1, col2, col3, col4 = st.columns(4)
-
 
 with col1:
 
@@ -497,7 +478,6 @@ with col1:
         """
     )
 
-
 with col2:
 
     st.html(
@@ -519,7 +499,6 @@ with col2:
         </div>
         """
     )
-
 
 with col3:
 
@@ -543,7 +522,6 @@ with col3:
         """
     )
 
-
 with col4:
 
     st.html(
@@ -566,7 +544,6 @@ with col4:
         """
     )
 
-
 # ============================================================
 # SYSTEM PIPELINE
 # ============================================================
@@ -579,7 +556,6 @@ st.html(
     """
 )
 
-
 pipeline = [
     ("01", "Dataset", "Upload DEAP / SEED"),
     ("02", "Preprocessing", "Signal preparation"),
@@ -589,9 +565,7 @@ pipeline = [
     ("06", "Classification", "Emotion prediction"),
 ]
 
-
 cols = st.columns(6)
-
 
 for col, (number, title, description) in zip(
     cols,
@@ -620,7 +594,6 @@ for col, (number, title, description) in zip(
             """
         )
 
-
 # ============================================================
 # DATASETS
 # ============================================================
@@ -633,9 +606,7 @@ st.html(
     """
 )
 
-
 dataset_col1, dataset_col2 = st.columns(2)
-
 
 with dataset_col1:
 
@@ -644,21 +615,16 @@ with dataset_col1:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 DEAP
+                DEAP
             </div>
 
             <div class="dataset-text">
 
                 <b>32</b> subjects<br>
-
                 <b>32</b> EEG channels<br>
-
                 <b>40</b> trials per subject<br>
-
                 <b>128 Hz</b> sampling rate<br>
-
                 Valence and Arousal classification<br>
-
                 Differential Entropy + PSD features
 
             </div>
@@ -667,7 +633,6 @@ with dataset_col1:
         """
     )
 
-
 with dataset_col2:
 
     st.html(
@@ -675,21 +640,16 @@ with dataset_col2:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 SEED
+                SEED
             </div>
 
             <div class="dataset-text">
 
                 <b>15</b> subjects<br>
-
                 <b>62</b> EEG channels<br>
-
                 <b>3</b> emotion classes<br>
-
                 Negative / Neutral / Positive<br>
-
                 Differential Entropy representation<br>
-
                 Spatial electrode graph
 
             </div>
@@ -697,7 +657,6 @@ with dataset_col2:
         </div>
         """
     )
-
 
 # ============================================================
 # CURRENT UPLOAD STATUS
@@ -711,7 +670,6 @@ st.html(
     """
 )
 
-
 if st.session_state.dataset_processed:
 
     dataset_name = st.session_state.dataset_type
@@ -723,7 +681,7 @@ if st.session_state.dataset_processed:
     info = st.session_state.dataset_info
 
     st.success(
-        f"✓ {dataset_name} dataset processed successfully."
+        f"{dataset_name} dataset processed successfully."
     )
 
     status_col1, status_col2, status_col3, status_col4 = st.columns(4)
@@ -731,24 +689,28 @@ if st.session_state.dataset_processed:
     if dataset_name == "DEAP":
 
         with status_col1:
+
             st.metric(
                 "Dataset",
                 "DEAP",
             )
 
         with status_col2:
+
             st.metric(
                 "Trials",
                 info.get("trials", "-"),
             )
 
         with status_col3:
+
             st.metric(
                 "Channels",
                 info.get("channels", "-"),
             )
 
         with status_col4:
+
             st.metric(
                 "Features",
                 info.get("features_per_window", "-"),
@@ -757,24 +719,28 @@ if st.session_state.dataset_processed:
     else:
 
         with status_col1:
+
             st.metric(
                 "Dataset",
                 "SEED",
             )
 
         with status_col2:
+
             st.metric(
                 "Samples",
                 f"{info.get('samples', 0):,}",
             )
 
         with status_col3:
+
             st.metric(
                 "Channels",
                 info.get("channels", "-"),
             )
 
         with status_col4:
+
             st.metric(
                 "Classes",
                 info.get("classes", "-"),
@@ -793,7 +759,6 @@ else:
         "Open 'Upload Dataset' from the sidebar to begin."
     )
 
-
 # ============================================================
 # BEST SEED MODEL
 # ============================================================
@@ -806,14 +771,12 @@ st.html(
     """
 )
 
-
 seed_file = (
     Path(__file__).resolve().parent
     / "results"
     / "SEED"
     / "seed_model_comparison.csv"
 )
-
 
 if seed_file.exists():
 
@@ -902,7 +865,6 @@ else:
         "SEED evaluation results were not found."
     )
 
-
 # ============================================================
 # PROJECT STATUS
 # ============================================================
@@ -915,30 +877,25 @@ st.html(
     """
 )
 
-
 status_col1, status_col2, status_col3 = st.columns(3)
-
 
 with status_col1:
 
     st.success(
-        "✓ Dataset Processing"
+        "Dataset Processing"
     )
-
 
 with status_col2:
 
     st.success(
-        "✓ Model Evaluation"
+        "Model Evaluation"
     )
-
 
 with status_col3:
 
     st.success(
-        "✓ Interactive Dashboard"
+        "Interactive Dashboard"
     )
-
 
 # ============================================================
 # FOOTER
@@ -953,7 +910,7 @@ st.html(
 
         <br><br>
 
-        Academic Project • DEAP + SEED • GCN / GRU
+        Academic Project &nbsp; DEAP + SEED &nbsp; GCN / GRU
 
     </div>
     """

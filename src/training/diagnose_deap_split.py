@@ -176,7 +176,7 @@ def analyze_split(name, data):
     majority_macro_f1 = f1_score(
         labels,
         majority_predictions,
-        average="macro",
+        average="macr,
         zero_division=0
     )
 
@@ -301,17 +301,17 @@ print(
 print()
 
 print(
-    "Train ∩ Validation:",
+    "Train  Validation:",
     sorted(train_val_overlap)
 )
 
 print(
-    "Train ∩ Test:",
+    "Train  Test:",
     sorted(train_test_overlap)
 )
 
 print(
-    "Validation ∩ Test:",
+    "Validation  Test:",
     sorted(val_test_overlap)
 )
 
@@ -324,14 +324,14 @@ if (
 
     print()
     print(
-        "✓ NO SUBJECT OVERLAP DETECTED"
+        " NO SUBJECT OVERLAP DETECTED"
     )
 
 else:
 
     print()
     print(
-        "⚠ SUBJECT OVERLAP DETECTED"
+        " SUBJECT OVERLAP DETECTED"
     )
 
 
@@ -483,7 +483,7 @@ balanced_accuracy = (
 macro_f1 = f1_score(
     current_labels,
     current_predictions,
-    average="macro",
+    average="macr,
     zero_division=0
 )
 
@@ -583,7 +583,7 @@ baseline_balanced_accuracy = (
 baseline_macro_f1 = f1_score(
     test_labels,
     baseline_predictions,
-    average="macro",
+    average="macr,
     zero_division=0
 )
 
@@ -636,14 +636,14 @@ print()
 if len(train_val_overlap) == 0:
 
     print(
-        "✓ Train and validation subjects "
+        " Train and validation subjects "
         "are completely separated."
     )
 
 else:
 
     print(
-        "⚠ Train and validation subjects "
+        " Train and validation subjects "
         "overlap."
     )
 
@@ -651,14 +651,14 @@ else:
 if len(train_test_overlap) == 0:
 
     print(
-        "✓ Train and test subjects "
+        " Train and test subjects "
         "are completely separated."
     )
 
 else:
 
     print(
-        "⚠ Train and test subjects "
+        " Train and test subjects "
         "overlap."
     )
 
@@ -666,14 +666,14 @@ else:
 if len(val_test_overlap) == 0:
 
     print(
-        "✓ Validation and test subjects "
+        " Validation and test subjects "
         "are completely separated."
     )
 
 else:
 
     print(
-        "⚠ Validation and test subjects "
+        " Validation and test subjects "
         "overlap."
     )
 

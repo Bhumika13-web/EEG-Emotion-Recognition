@@ -141,7 +141,7 @@ def load_seed_arrays():
                 data = value
 
                 print(
-                    f"\n✓ Data found in loader.{name}"
+                    f"\n Data found in loader.{name}"
                 )
 
                 break
@@ -161,7 +161,7 @@ def load_seed_arrays():
                 labels = value
 
                 print(
-                    f"✓ Labels found in loader.{name}"
+                    f" Labels found in loader.{name}"
                 )
 
                 break
@@ -181,7 +181,7 @@ def load_seed_arrays():
                 subjects = value
 
                 print(
-                    f"✓ Subjects found in loader.{name}"
+                    f" Subjects found in loader.{name}"
                 )
 
                 break
@@ -237,7 +237,7 @@ def load_seed_arrays():
             data = npz[npz.files[0]]
 
         print(
-            f"✓ Data loaded directly: "
+            f" Data loaded directly: "
             f"{data.shape}"
         )
 
@@ -259,7 +259,7 @@ def load_seed_arrays():
             labels = npz[npz.files[0]]
 
         print(
-            f"✓ Labels loaded directly: "
+            f" Labels loaded directly: "
             f"{labels.shape}"
         )
 
@@ -281,7 +281,7 @@ def load_seed_arrays():
             subjects = npz[npz.files[0]]
 
         print(
-            f"✓ Subjects loaded directly: "
+            f" Subjects loaded directly: "
             f"{subjects.shape}"
         )
 
@@ -437,13 +437,13 @@ def analyze_labels(labels):
         if difference < 0.05 * total:
 
             print(
-                "✓ Classes are relatively balanced."
+                " Classes are relatively balanced."
             )
 
         else:
 
             print(
-                "⚠ Classes show noticeable imbalance."
+                " Classes show noticeable imbalance."
             )
 
 
@@ -569,14 +569,14 @@ def analyze_subject_order(subjects):
     if contiguous:
 
         print(
-            "\n✓ Every subject occupies "
+            "\n Every subject occupies "
             "one contiguous block."
         )
 
     else:
 
         print(
-            "\n⚠ Subjects are not stored "
+            "\n Subjects are not stored "
             "in single contiguous blocks."
         )
 
@@ -664,13 +664,13 @@ def analyze_missing_values(data):
     if nan_count == 0 and inf_count == 0:
 
         print(
-            "✓ No NaN or Inf values detected."
+            " No NaN or Inf values detected."
         )
 
     else:
 
         print(
-            "⚠ Dataset contains invalid "
+            " Dataset contains invalid "
             "numerical values."
         )
 
@@ -719,7 +719,7 @@ def analyze_representation(data):
     if data.ndim != 3:
 
         print(
-            f"⚠ Expected 3D data, "
+            f" Expected 3D data, "
             f"received {data.ndim}D."
         )
 
@@ -964,20 +964,20 @@ def analyze_samples_per_subject(
     if np.all(counts == counts[0]):
 
         print(
-            f"\n✓ Every subject has exactly "
+            f"\n Every subject has exactly "
             f"{counts[0]} samples."
         )
 
     else:
 
         print(
-            "\n⚠ Sample count differs "
+            "\n Sample count differs "
             "between subjects."
         )
 
 
 # ============================================================
-# 13. SUBJECT × LABEL
+# 13. SUBJECT  LABEL
 # ============================================================
 
 def analyze_subject_label_consistency(
@@ -986,7 +986,7 @@ def analyze_subject_label_consistency(
 ):
 
     section(
-        "13. SUBJECT × LABEL CONSISTENCY"
+        "13. SUBJECT  LABEL CONSISTENCY"
     )
 
     unique_subjects = np.unique(subjects)
@@ -1052,14 +1052,14 @@ def analyze_subject_label_consistency(
             all_present = False
 
             print(
-                f"⚠ Subject {subject} "
+                f" Subject {subject} "
                 f"does not contain all labels."
             )
 
     if all_present:
 
         print(
-            "✓ Every subject contains "
+            " Every subject contains "
             "every emotion class."
         )
 
@@ -1102,7 +1102,7 @@ def analyze_sample_count_structure(
             if n % i == 0:
 
                 print(
-                    f"{i} × {n // i} = {n}"
+                    f"{i}  {n // i} = {n}"
                 )
 
         print(
@@ -1184,7 +1184,7 @@ def print_final_summary(
 
     print(
         "Before SEED preprocessing/modeling, "
-        "we need to establish what the 5 × 62 "
+        "we need to establish what the 5  62 "
         "representation actually represents."
     )
 

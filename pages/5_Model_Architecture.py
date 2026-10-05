@@ -330,7 +330,7 @@ for i in range(0, len(steps), 3):
     if i < len(steps) - 3:
 
         st.markdown(
-            '<div class="arrow">↓</div>',
+            '<div class="arrow"></div>',
             unsafe_allow_html=True,
         )
 
@@ -370,7 +370,7 @@ The processed DEAP representation contains:
 
 <p>
 Final representation:
-<b>30 × 32 × 10</b>
+<b>30  32  10</b>
 </p>
 
 <p>
@@ -405,7 +405,7 @@ The processed SEED representation contains:
 
 <p>
 Final sample representation:
-<b>5 × 62</b>
+<b>5  62</b>
 </p>
 
 <p>
@@ -433,7 +433,7 @@ st.markdown(
     """
 <div class="info-panel">
 
-<b>Why GCN?</b><br><br>
+<b>Why GCN</b><br><br>
 
 EEG electrodes are located at different positions on the
 scalp. A graph representation allows the model to represent
@@ -476,7 +476,7 @@ with g2:
         """
 <div class="flow-box">
 <div class="flow-number">GCN LAYER 1</div>
-<div class="flow-title">5 → 32</div>
+<div class="flow-title">5  32</div>
 <div class="flow-detail">Spatial feature extraction</div>
 </div>
 """,
@@ -489,7 +489,7 @@ with g3:
         """
 <div class="flow-box">
 <div class="flow-number">GCN LAYER 2</div>
-<div class="flow-title">32 → 64</div>
+<div class="flow-title">32  64</div>
 <div class="flow-detail">Higher-level spatial features</div>
 </div>
 """,
@@ -503,7 +503,7 @@ with g4:
 <div class="flow-box">
 <div class="flow-number">POOLING</div>
 <div class="flow-title">Mean Pooling</div>
-<div class="flow-detail">62 nodes → graph representation</div>
+<div class="flow-detail">62 nodes  graph representation</div>
 </div>
 """,
         unsafe_allow_html=True,
@@ -521,15 +521,15 @@ st.markdown(
 
 
 seed_layers = [
-    "Input: 5 features × 62 electrodes",
-    "GCNConv: 5 → 32",
+    "Input: 5 features  62 electrodes",
+    "GCNConv: 5  32",
     "ReLU + Dropout",
-    "GCNConv: 32 → 64",
+    "GCNConv: 32  64",
     "ReLU + Dropout",
     "Mean pooling across 62 nodes",
-    "Linear: 64 → 32",
+    "Linear: 64  32",
     "ReLU + Dropout",
-    "Linear: 32 → 3",
+    "Linear: 32  3",
     "Output: Negative / Neutral / Positive",
 ]
 
@@ -593,7 +593,7 @@ st.markdown(
     """
 <div class="arch-card">
 
-<h3>Why GRU?</h3>
+<h3>Why GRU</h3>
 
 <p>
 EEG signals contain temporal dependencies. The GRU is used
@@ -689,7 +689,7 @@ Each processed trial is represented as:
 </p>
 
 <p style="font-size:24px; font-weight:800;">
-30 × 32 × 10
+30  32  10
 </p>
 
 <p>
@@ -767,11 +767,11 @@ Architecture:
 </p>
 
 <ul>
-<li>GCNConv 5 → 32</li>
-<li>GCNConv 32 → 64</li>
+<li>GCNConv 5  32</li>
+<li>GCNConv 32  64</li>
 <li>Mean graph pooling</li>
-<li>Linear 64 → 32</li>
-<li>Linear 32 → 3</li>
+<li>Linear 64  32</li>
+<li>Linear 32  3</li>
 </ul>
 
 <p>
@@ -800,7 +800,7 @@ the spatial GCN representation.
 <ul>
 <li>GCN spatial representation</li>
 <li>GRU hidden size: 64</li>
-<li>Classifier: 64 → 32 → 3</li>
+<li>Classifier: 64  32  3</li>
 </ul>
 
 <p>
@@ -1055,5 +1055,5 @@ for col, (num, title, detail) in zip(
 st.markdown("---")
 
 st.caption(
-    "Model Architecture • EEG Emotion Recognition • DEAP + SEED"
+    "Model Architecture  EEG Emotion Recognition  DEAP + SEED"
 )

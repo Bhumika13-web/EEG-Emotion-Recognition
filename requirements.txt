@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 streamlit>=1.35.0
 scikit-learn>=1.4.0
 numpy
@@ -7,3 +8,14 @@ joblib
 plotly
 matplotlib
 mne
+=======
+﻿streamlit==1.32.2
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+plotly
+networkx
+joblib
+>>>>>>> feature/arsh-setup

@@ -62,7 +62,7 @@ def load_data():
 
 def flatten_features(X):
 
-    # 5 frequency bands × 62 electrodes = 310 features
+    # 5 frequency bands  62 electrodes = 310 features
 
     return X.reshape(X.shape[0], -1)
 
@@ -85,7 +85,7 @@ def evaluate_model(model, X, y, name):
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macro"
+        average="macr
     )
 
     weighted_f1 = f1_score(

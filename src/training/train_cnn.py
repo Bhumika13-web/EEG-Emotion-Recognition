@@ -327,7 +327,7 @@ def evaluate(
     macro_f1 = f1_score(
         targets,
         predictions,
-        average="macro",
+        average="macr,
         zero_division=0
     )
 
@@ -341,14 +341,14 @@ def evaluate(
     precision = precision_score(
         targets,
         predictions,
-        average="macro",
+        average="macr,
         zero_division=0
     )
 
     recall = recall_score(
         targets,
         predictions,
-        average="macro",
+        average="macr,
         zero_division=0
     )
 
@@ -372,7 +372,7 @@ def evaluate(
 def main():
 
     print("=" * 70)
-    print("CNN BASELINE — DEAP VALENCE")
+    print("CNN BASELINE  DEAP VALENCE")
     print("=" * 70)
 
     # --------------------------------------------------------
@@ -635,7 +635,7 @@ def main():
         train_macro_f1 = f1_score(
             train_targets,
             train_predictions,
-            average="macro",
+            average="macr,
             zero_division=0
         )
 
@@ -747,7 +747,7 @@ def main():
             )
 
             print(
-                "✓ BEST MODEL SAVED"
+                " BEST MODEL SAVED"
             )
 
         else:

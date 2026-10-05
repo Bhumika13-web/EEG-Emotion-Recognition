@@ -835,7 +835,7 @@ for epoch in range(
         print()
 
         print(
-            "  ✓ BEST MODEL SAVED"
+            "   BEST MODEL SAVED"
         )
 
         print(

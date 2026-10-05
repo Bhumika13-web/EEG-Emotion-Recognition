@@ -1,7 +1,11 @@
 import streamlit as st
+
 import numpy as np
+
 import pandas as pd
+
 import plotly.graph_objects as go
+
 from pathlib import Path
 
 
@@ -11,7 +15,7 @@ from pathlib import Path
 
 st.set_page_config(
     page_title="Feature Analysis",
-    page_icon="📊",
+    page_icon="",
     layout="wide",
 )
 
@@ -100,8 +104,8 @@ st.markdown(
 }
 
 .info-card {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--st-secondary-background-color);
+    border: 1px solid var(--st-border-color);
     border-radius: 15px;
     padding: 20px;
     min-height: 120px;
@@ -109,12 +113,13 @@ st.markdown(
 }
 
 .info-title {
-    color: #64748b;
+    color: var(--st-text-color);
+    opacity: 0.7;
     font-size: 13px;
 }
 
 .info-value {
-    color: #0f172a;
+    color: var(--st-heading-color);
     font-size: 26px;
     font-weight: 800;
     margin-top: 5px;
@@ -123,7 +128,7 @@ st.markdown(
 .section-title {
     font-size: 24px;
     font-weight: 750;
-    color: #0f172a;
+    color: var(--st-heading-color);
     margin-top: 30px;
     margin-bottom: 12px;
 }
@@ -143,7 +148,7 @@ st.markdown(
 <div class="feature-header">
 
 <div class="feature-header-title">
-📊 EEG Feature Analysis
+ EEG Feature Analysis
 </div>
 
 <div class="feature-header-text">
@@ -168,6 +173,7 @@ def load_deap():
     file_path = PROCESSED_DIR / "deap_train.npz"
 
     if not file_path.exists():
+
         return None
 
     data = np.load(file_path)
@@ -194,9 +200,13 @@ if data is None:
 
 
 features = data["features"]
+
 valence = data["valence"]
+
 arousal = data["arousal"]
+
 subjects = data["subjects"]
+
 trials = data["trials"]
 
 
@@ -562,13 +572,15 @@ feature_type = st.radio(
 if feature_type == "Differential Entropy":
 
     selected_matrix = window_features[
-        :, DE_INDICES
+        :,
+        DE_INDICES
     ].T
 
 else:
 
     selected_matrix = window_features[
-        :, PSD_INDICES
+        :,
+        PSD_INDICES
     ].T
 
 
@@ -584,7 +596,7 @@ heatmap = go.Figure(
 
 heatmap.update_layout(
     title=(
-        f"{feature_type} — "
+        f"{feature_type} "
         f"Window {selected_window + 1}"
     ),
     xaxis_title="EEG Channel",
@@ -805,7 +817,10 @@ stats_rows = []
 for i, name in enumerate(FEATURE_NAMES):
 
     values = features[
-        :, :, :, i
+        :,
+        :,
+        :,
+        i
     ].flatten()
 
     stats_rows.append(
@@ -854,6 +869,7 @@ st.dataframe(
 
 st.markdown("---")
 
+
 st.caption(
-    "Feature Analysis • DEAP • Differential Entropy + PSD"
+    "Feature Analysis · DEAP · Differential Entropy + PSD"
 )

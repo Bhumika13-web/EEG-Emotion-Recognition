@@ -83,7 +83,7 @@ class SEEDLoader:
                 )
 
             print(
-                f"{'':10s}  ✓ Found"
+                f"{'':10s}   Found"
             )
 
     # ========================================================
@@ -333,7 +333,7 @@ class SEEDLoader:
             )
 
     # ========================================================
-    # CHECK LABEL × SUBJECT DISTRIBUTION
+    # CHECK LABEL  SUBJECT DISTRIBUTION
     # ========================================================
 
     def subject_label_distribution(self):
@@ -346,7 +346,7 @@ class SEEDLoader:
             )
 
         print("\n" + "=" * 70)
-        print("SUBJECT × LABEL DISTRIBUTION")
+        print("SUBJECT  LABEL DISTRIBUTION")
         print("=" * 70)
 
         unique_subjects = np.unique(
@@ -465,7 +465,7 @@ def main():
     loader.summary()
 
     # --------------------------------------------------------
-    # Subject × label distribution
+    # Subject  label distribution
     # --------------------------------------------------------
 
     loader.subject_label_distribution()
