@@ -1,10 +1,11 @@
-﻿import streamlit as st
-import numpy as np
+﻿import io
 import pickle
 import tempfile
 import zipfile
 from pathlib import Path
 
+import numpy as np
+import streamlit as st
 from scipy.signal import butter, sosfiltfilt, welch
 
 
@@ -64,120 +65,112 @@ SEED_BANDS = [
 
 st.markdown(
     """
-<style>
+    <style>
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-}
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
 
-.page-title {
-    font-size: 36px;
-    font-weight: 800;
-    color: var(--st-heading-color) !important;
-    margin-bottom: 8px;
-}
+    .page-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--st-heading-color) !important;
+        margin-bottom: 8px;
+    }
 
-.page-subtitle {
-    font-size: 16px;
-    color: var(--st-text-color) !important;
-    opacity: 0.72;
-    margin-bottom: 28px;
-}
+    .page-subtitle {
+        font-size: 16px;
+        color: var(--st-text-color) !important;
+        opacity: 0.72;
+        margin-bottom: 28px;
+    }
 
-.section-title {
-    font-size: 24px;
-    font-weight: 750;
-    color: var(--st-heading-color) !important;
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
+    .section-title {
+        font-size: 24px;
+        font-weight: 750;
+        color: var(--st-heading-color) !important;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
 
-.info-card {
-    background: var(--st-secondary-background-color);
-    border: 1px solid var(--st-border-color);
-    border-radius: 16px;
-    padding: 22px;
-    margin-bottom: 18px;
-}
+    .info-card {
+        background: var(--st-secondary-background-color);
+        border: 1px solid var(--st-border-color);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 18px;
+    }
 
-.info-title {
-    color: var(--st-heading-color) !important;
-    font-size: 19px;
-    font-weight: 750;
-    margin-bottom: 10px;
-}
+    .info-title {
+        color: var(--st-heading-color) !important;
+        font-size: 19px;
+        font-weight: 750;
+        margin-bottom: 10px;
+    }
 
-.info-text {
-    color: var(--st-text-color) !important;
-    opacity: 0.82;
-    line-height: 1.8;
-}
+    .info-text {
+        color: var(--st-text-color) !important;
+        opacity: 0.82;
+        line-height: 1.8;
+    }
 
-.dataset-card {
-    background: var(--st-secondary-background-color);
-    border: 1px solid var(--st-border-color);
-    border-radius: 16px;
-    padding: 22px;
-    min-height: 225px;
-}
+    .dataset-card {
+        background: var(--st-secondary-background-color);
+        border: 1px solid var(--st-border-color);
+        border-radius: 16px;
+        padding: 22px;
+        min-height: 225px;
+    }
 
-.dataset-title {
-    color: var(--st-heading-color) !important;
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 12px;
-}
+    .dataset-title {
+        color: var(--st-heading-color) !important;
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
 
-.dataset-text {
-    color: var(--st-text-color) !important;
-    opacity: 0.82;
-    line-height: 1.8;
-}
+    .dataset-text {
+        color: var(--st-text-color) !important;
+        opacity: 0.82;
+        line-height: 1.8;
+    }
 
-.success-card {
-    background: rgba(34, 197, 94, 0.10);
-    border: 1px solid rgba(34, 197, 94, 0.30);
-    border-radius: 15px;
-    padding: 18px 22px;
-    margin: 18px 0;
-}
+    .success-card {
+        background: rgba(34, 197, 94, 0.10);
+        border: 1px solid rgba(34, 197, 94, 0.30);
+        border-radius: 15px;
+        padding: 18px 22px;
+        margin: 18px 0;
+    }
 
-.success-title {
-    color: #16a34a !important;
-    font-size: 17px;
-    font-weight: 750;
-}
+    .success-title {
+        color: #16a34a !important;
+        font-size: 17px;
+        font-weight: 750;
+    }
 
-.success-text {
-    color: var(--st-text-color) !important;
-    opacity: 0.82;
-}
+    .success-text {
+        color: var(--st-text-color) !important;
+        opacity: 0.82;
+    }
 
-.warning-card {
-    background: rgba(245, 158, 11, 0.10);
-    border: 1px solid rgba(245, 158, 11, 0.30);
-    border-radius: 15px;
-    padding: 18px 22px;
-    margin: 18px 0;
-}
+    [data-testid="stMetricLabel"] {
+        color: var(--st-text-color) !important;
+    }
 
-[data-testid="stMetricLabel"] {
-    color: var(--st-text-color) !important;
-}
+    [data-testid="stMetricValue"] {
+        color: var(--st-heading-color) !important;
+    }
 
-[data-testid="stMetricValue"] {
-    color: var(--st-heading-color) !important;
-}
-
-</style>
-""",
+    </style>
+    """,
     unsafe_allow_html=True,
 )
 
 
 # ============================================================
-# INITIALIZE SESSION STATE
+# SESSION STATE
 # ============================================================
 
 SESSION_DEFAULTS = {
@@ -191,11 +184,8 @@ SESSION_DEFAULTS = {
     "upload_dataset_choice": "DEAP",
 }
 
-
 for key, default_value in SESSION_DEFAULTS.items():
-
     if key not in st.session_state:
-
         st.session_state[key] = default_value
 
 
@@ -232,30 +222,24 @@ dataset_col1, dataset_col2 = st.columns(2)
 
 
 with dataset_col1:
-
     st.html(
         """
         <div class="dataset-card">
 
             <div class="dataset-title">
-                 DEAP
+                DEAP
             </div>
 
             <div class="dataset-text">
 
                 <b>Input:</b> .dat subject files<br>
-
                 <b>EEG Channels:</b> 32<br>
-
                 <b>Sampling Rate:</b> 128 Hz<br>
-
                 <b>Trials:</b> 40 per subject<br>
-
                 <b>Processing:</b>
                 Filtering + windowing + DE + PSD<br>
-
                 <b>Representation:</b>
-                30 windows  32 channels  10 features
+                30 windows × 32 channels × 10 features
 
             </div>
 
@@ -265,31 +249,25 @@ with dataset_col1:
 
 
 with dataset_col2:
-
     st.html(
         """
         <div class="dataset-card">
 
             <div class="dataset-title">
-                 SEED
+                SEED
             </div>
 
             <div class="dataset-text">
 
                 <b>Input:</b> .npz files<br>
-
                 <b>EEG Channels:</b> 62<br>
-
                 <b>Frequency Bands:</b> 5<br>
-
                 <b>Classes:</b>
                 Negative / Neutral / Positive<br>
-
                 <b>Processing:</b>
                 Validation + normalization<br>
-
                 <b>Representation:</b>
-                5 frequency bands  62 channels
+                5 frequency bands × 62 channels
 
             </div>
 
@@ -303,7 +281,7 @@ with dataset_col2:
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">Step 1  Select Dataset</div>',
+    '<div class="section-title">Step 1 — Select Dataset</div>',
     unsafe_allow_html=True,
 )
 
@@ -336,22 +314,15 @@ if (
     st.session_state.processed_source = None
     st.session_state.processed_filename = None
 
-
 st.session_state.upload_dataset_choice = dataset_choice
 
 
 # ============================================================
-# PRECOMPUTE DEAP FILTERS
+# DEAP FILTERS
 # ============================================================
 
 @st.cache_resource
 def get_deap_band_filters():
-    """
-    Create the five DEAP Butterworth filters once.
-
-    This prevents recreating filter coefficients for
-    every EEG window.
-    """
 
     filters = {}
 
@@ -386,29 +357,26 @@ def get_deap_band_filters():
 # DEAP FEATURE EXTRACTION
 # ============================================================
 
-def calculate_deap_window_features(
-    window,
-):
+def calculate_deap_window_features(window):
     """
-    Calculate DE + PSD for ONE DEAP EEG window.
+    Calculate Differential Entropy and PSD
+    for one DEAP EEG window.
 
     Input:
-        channels  samples
+        window -> (32, samples)
 
     Output:
-        channels  10
+        (32, 10)
 
-    5 DE + 5 PSD
+    10 features:
+        5 Differential Entropy
+        5 PSD
     """
 
     band_filters = get_deap_band_filters()
 
     all_de = []
     all_psd = []
-
-    # --------------------------------------------------------
-    # PSD calculated once for the window
-    # --------------------------------------------------------
 
     frequencies, psd = welch(
         window,
@@ -420,18 +388,12 @@ def calculate_deap_window_features(
         axis=-1,
     )
 
-    # --------------------------------------------------------
-    # Process each frequency band
-    # --------------------------------------------------------
-
     for band_name, (
         low_frequency,
         high_frequency,
     ) in DEAP_BANDS.items():
 
-        sos = band_filters[
-            band_name
-        ]
+        sos = band_filters[band_name]
 
         band_signal = sosfiltfilt(
             sos,
@@ -439,9 +401,9 @@ def calculate_deap_window_features(
             axis=-1,
         )
 
-        # ====================================================
+        # ----------------------------------------------------
         # Differential Entropy
-        # ====================================================
+        # ----------------------------------------------------
 
         variance = np.var(
             band_signal,
@@ -467,9 +429,9 @@ def calculate_deap_window_features(
             de_values
         )
 
-        # ====================================================
+        # ----------------------------------------------------
         # PSD
-        # ====================================================
+        # ----------------------------------------------------
 
         mask = (
             (frequencies >= low_frequency)
@@ -482,10 +444,7 @@ def calculate_deap_window_features(
         if np.any(mask):
 
             band_psd = np.mean(
-                psd[
-                    :,
-                    mask,
-                ],
+                psd[:, mask],
                 axis=-1,
             )
 
@@ -506,11 +465,6 @@ def calculate_deap_window_features(
         all_psd.append(
             band_psd
         )
-
-
-    # ========================================================
-    # STACK FEATURES
-    # ========================================================
 
     de_features = np.stack(
         all_de,
@@ -543,31 +497,15 @@ def calculate_deap_window_features(
     show_spinner=False,
     max_entries=32,
 )
-def process_deap_subject(
-    file_bytes,
-):
-    """
-    Process one DEAP subject.
-
-    IMPORTANT:
-    This function is cached.
-
-    Therefore if Streamlit reruns the page,
-    the same subject file will not be processed
-    again.
-    """
+def process_deap_subject(file_bytes):
 
     with tempfile.NamedTemporaryFile(
         suffix=".dat",
         delete=False,
     ) as temp_file:
 
-        temp_file.write(
-            file_bytes
-        )
-
+        temp_file.write(file_bytes)
         temp_path = temp_file.name
-
 
     try:
 
@@ -583,27 +521,19 @@ def process_deap_subject(
 
     finally:
 
-        Path(
-            temp_path
-        ).unlink(
+        Path(temp_path).unlink(
             missing_ok=True
         )
 
-
     if "data" not in subject_data:
-
         raise ValueError(
-            "DEAP file does not contain "
-            "'data'."
+            "DEAP file does not contain 'data'."
         )
 
     if "labels" not in subject_data:
-
         raise ValueError(
-            "DEAP file does not contain "
-            "'labels'."
+            "DEAP file does not contain 'labels'."
         )
-
 
     raw_data = np.asarray(
         subject_data["data"]
@@ -613,74 +543,49 @@ def process_deap_subject(
         subject_data["labels"]
     )
 
-
     if raw_data.ndim != 3:
-
         raise ValueError(
-            "Unexpected DEAP data shape: "
+            f"Unexpected DEAP data shape: "
             f"{raw_data.shape}"
         )
 
-
     trials = raw_data.shape[0]
-
     total_channels = raw_data.shape[1]
-
     total_samples = raw_data.shape[2]
 
-
-    if total_channels < 32:
-
+    if total_channels < DEAP_EEG_CHANNELS:
         raise ValueError(
             "DEAP dataset must contain "
             "at least 32 EEG channels."
         )
 
-
     if total_samples < DEAP_WINDOW_SAMPLES:
-
         raise ValueError(
             "DEAP trial is too short for "
             "a 4-second window."
         )
 
-
-    # --------------------------------------------------------
-    # Use first 32 EEG channels
-    # --------------------------------------------------------
-
+    # First 32 channels are EEG channels.
     eeg_data = raw_data[
         :,
-        :32,
+        :DEAP_EEG_CHANNELS,
         :,
     ]
 
-
     processed_trials = []
 
-
-    # --------------------------------------------------------
-    # Process trials
-    # --------------------------------------------------------
-
-    for trial_index in range(
-        trials
-    ):
+    for trial_index in range(trials):
 
         trial = eeg_data[
             trial_index
         ]
 
-
         trial_windows = []
-
 
         start = 0
 
-
         while (
-            start
-            + DEAP_WINDOW_SAMPLES
+            start + DEAP_WINDOW_SAMPLES
             <= total_samples
         ):
 
@@ -689,12 +594,10 @@ def process_deap_subject(
                 + DEAP_WINDOW_SAMPLES
             )
 
-
             window = trial[
                 :,
                 start:end,
             ]
-
 
             window_features = (
                 calculate_deap_window_features(
@@ -702,24 +605,23 @@ def process_deap_subject(
                 )
             )
 
-
-            # 32  10  320
-
-            flattened = (
-                window_features
-                .reshape(
-                    32 * 10
-                )
+            # Convert:
+            # (32, 10) -> (320,)
+            flattened = window_features.reshape(
+                DEAP_EEG_CHANNELS * 10
             )
-
 
             trial_windows.append(
                 flattened
             )
 
-
             start += DEAP_STEP_SAMPLES
 
+        if not trial_windows:
+            raise ValueError(
+                f"No valid windows generated "
+                f"for DEAP trial {trial_index + 1}."
+            )
 
         processed_trials.append(
             np.stack(
@@ -728,56 +630,34 @@ def process_deap_subject(
             )
         )
 
-
     features = np.stack(
         processed_trials,
         axis=0,
     )
 
-
     return (
-        features.astype(
-            np.float32
-        ),
-        labels.astype(
-            np.float32
-        ),
+        features.astype(np.float32),
+        labels.astype(np.float32),
     )
 
 
 # ============================================================
-# FIND DEAP FILES
+# EXTRACT DEAP FILES
 # ============================================================
 
-@st.cache_data(show_spinner=False)
-def extract_deap_files(
-    uploaded_files,
-):
-    """
-    Find individual .dat files.
-
-    ZIP files are also supported if they contain
-    DEAP .dat files.
-    """
+def extract_deap_files(uploaded_files):
 
     result = []
 
-
     for uploaded_file in uploaded_files:
 
-        filename = (
-            uploaded_file.name
-            .lower()
-        )
-
+        filename = uploaded_file.name.lower()
 
         # ----------------------------------------------------
-        # Direct .dat
+        # Direct .dat file
         # ----------------------------------------------------
 
-        if filename.endswith(
-            ".dat"
-        ):
+        if filename.endswith(".dat"):
 
             result.append(
                 (
@@ -786,41 +666,18 @@ def extract_deap_files(
                 )
             )
 
-
         # ----------------------------------------------------
-        # ZIP
+        # ZIP file
         # ----------------------------------------------------
 
-        elif filename.endswith(
-            ".zip"
-        ):
+        elif filename.endswith(".zip"):
+
+            zip_bytes = uploaded_file.getvalue()
 
             try:
 
-                zip_bytes = (
-                    uploaded_file.getvalue()
-                )
-
-
                 with zipfile.ZipFile(
-                    tempfile.SpooledTemporaryFile(
-                        max_size=50 * 1024 * 1024
-                    ),
-                    "r",
-                ) as _:
-
-                    pass
-
-            except Exception:
-
-                # Use direct BytesIO fallback
-
-                import io
-
-                with zipfile.ZipFile(
-                    io.BytesIO(
-                        zip_bytes
-                    ),
+                    io.BytesIO(zip_bytes),
                     "r",
                 ) as archive:
 
@@ -828,9 +685,7 @@ def extract_deap_files(
 
                         if (
                             not info.is_dir()
-                            and info.filename
-                            .lower()
-                            .endswith(
+                            and info.filename.lower().endswith(
                                 ".dat"
                             )
                         ):
@@ -840,11 +695,16 @@ def extract_deap_files(
                                     Path(
                                         info.filename
                                     ).name,
-                                    archive.read(
-                                        info
-                                    ),
+                                    archive.read(info),
                                 )
                             )
+
+            except zipfile.BadZipFile as error:
+
+                raise ValueError(
+                    f"Invalid ZIP file: "
+                    f"{uploaded_file.name}"
+                ) from error
 
     return result
 
@@ -863,36 +723,25 @@ def load_seed_arrays(
     subjects_bytes,
 ):
     """
-    Load the three SEED NPZ files.
+    Load and validate the three SEED NPZ files.
 
-    This function is cached, so repeated Streamlit
-    reruns do not repeatedly read and validate
-    the same dataset.
+    Expected data shape:
+        (samples, 5, 62)
     """
-
-    import io
-
 
     # --------------------------------------------------------
     # DATA
     # --------------------------------------------------------
 
     data_npz = np.load(
-        io.BytesIO(
-            data_bytes
-        ),
+        io.BytesIO(data_bytes),
         allow_pickle=True,
     )
 
-
-    if len(
-        data_npz.files
-    ) == 0:
-
+    if len(data_npz.files) == 0:
         raise ValueError(
             "Dataset NPZ contains no arrays."
         )
-
 
     data_array = np.asarray(
         data_npz[
@@ -900,27 +749,20 @@ def load_seed_arrays(
         ]
     )
 
-
     # --------------------------------------------------------
     # LABELS
     # --------------------------------------------------------
 
     labels_array = None
 
-
     if labels_bytes is not None:
 
         labels_npz = np.load(
-            io.BytesIO(
-                labels_bytes
-            ),
+            io.BytesIO(labels_bytes),
             allow_pickle=True,
         )
 
-
-        if len(
-            labels_npz.files
-        ) > 0:
+        if len(labels_npz.files) > 0:
 
             labels_array = np.asarray(
                 labels_npz[
@@ -928,27 +770,20 @@ def load_seed_arrays(
                 ]
             )
 
-
     # --------------------------------------------------------
     # SUBJECTS
     # --------------------------------------------------------
 
     subjects_array = None
 
-
     if subjects_bytes is not None:
 
         subjects_npz = np.load(
-            io.BytesIO(
-                subjects_bytes
-            ),
+            io.BytesIO(subjects_bytes),
             allow_pickle=True,
         )
 
-
-        if len(
-            subjects_npz.files
-        ) > 0:
+        if len(subjects_npz.files) > 0:
 
             subjects_array = np.asarray(
                 subjects_npz[
@@ -956,51 +791,39 @@ def load_seed_arrays(
                 ]
             )
 
-
     # --------------------------------------------------------
-    # VALIDATION
+    # DATA VALIDATION
     # --------------------------------------------------------
 
     if data_array.ndim != 3:
-
         raise ValueError(
             "SEED data must have 3 dimensions."
         )
 
-
     if data_array.shape[1] != 5:
-
         raise ValueError(
             "SEED data must contain "
             "5 frequency bands."
         )
 
-
     if data_array.shape[2] != 62:
-
         raise ValueError(
             "SEED data must contain "
             "62 EEG channels."
         )
 
-
     data_array = data_array.astype(
         np.float32
     )
 
-
-    if not np.isfinite(
-        data_array
-    ).all():
-
+    if not np.isfinite(data_array).all():
         raise ValueError(
             "SEED data contains NaN "
             "or infinite values."
         )
 
-
     # --------------------------------------------------------
-    # LABELS
+    # LABEL VALIDATION
     # --------------------------------------------------------
 
     if labels_array is not None:
@@ -1008,11 +831,8 @@ def load_seed_arrays(
         labels_array = (
             labels_array
             .reshape(-1)
-            .astype(
-                np.int64
-            )
+            .astype(np.int64)
         )
-
 
         if (
             len(labels_array)
@@ -1024,9 +844,8 @@ def load_seed_arrays(
                 "does not match samples."
             )
 
-
     # --------------------------------------------------------
-    # SUBJECTS
+    # SUBJECT VALIDATION
     # --------------------------------------------------------
 
     if subjects_array is not None:
@@ -1034,11 +853,8 @@ def load_seed_arrays(
         subjects_array = (
             subjects_array
             .reshape(-1)
-            .astype(
-                np.int32
-            )
+            .astype(np.int32)
         )
-
 
         if (
             len(subjects_array)
@@ -1049,7 +865,6 @@ def load_seed_arrays(
                 "Number of SEED subject IDs "
                 "does not match samples."
             )
-
 
     return (
         data_array,
@@ -1065,10 +880,11 @@ def load_seed_arrays(
 if dataset_choice == "DEAP":
 
     st.markdown(
-        '<div class="section-title">Step 2  Upload DEAP Dataset</div>',
+        '<div class="section-title">'
+        'Step 2 — Upload DEAP Dataset'
+        '</div>',
         unsafe_allow_html=True,
     )
-
 
     st.html(
         """
@@ -1106,7 +922,6 @@ if dataset_choice == "DEAP":
         """
     )
 
-
     uploaded_deap_files = st.file_uploader(
         "Upload DEAP .dat or ZIP file",
         type=[
@@ -1117,43 +932,40 @@ if dataset_choice == "DEAP":
         key="deap_upload_files",
     )
 
-
     if uploaded_deap_files:
 
         st.markdown(
-            '<div class="section-title">Uploaded Files</div>',
+            '<div class="section-title">'
+            'Uploaded Files'
+            '</div>',
             unsafe_allow_html=True,
         )
-
 
         for file in uploaded_deap_files:
 
             size_mb = (
                 file.size
-                / (
-                    1024 * 1024
-                )
+                / (1024 * 1024)
             )
 
             st.write(
-                f" {file.name} "
-                f" {size_mb:.1f} MB"
+                f"{file.name} — "
+                f"{size_mb:.1f} MB"
             )
 
-
         st.markdown(
-            '<div class="section-title">Processing</div>',
+            '<div class="section-title">'
+            'Processing'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-
         process_deap = st.button(
-            " Process DEAP Dataset",
+            "Process DEAP Dataset",
             type="primary",
             use_container_width=True,
             key="process_deap_button",
         )
-
 
         if process_deap:
 
@@ -1170,52 +982,39 @@ if dataset_choice == "DEAP":
                         )
                     )
 
-
                     if not dat_files:
-
                         raise ValueError(
                             "No DEAP .dat files "
                             "were found."
                         )
-
 
                     st.write(
                         f"Found {len(dat_files)} "
                         f"DEAP subject file(s)."
                     )
 
-
                     all_features = []
-
                     all_labels = []
-
                     processed_names = []
 
-
-                    progress = st.progress(
-                        0
-                    )
-
+                    progress = st.progress(0)
 
                     for index, (
                         filename,
                         file_bytes,
-                    ) in enumerate(
-                        dat_files
-                    ):
+                    ) in enumerate(dat_files):
 
                         st.write(
                             f"Processing "
                             f"{filename}..."
                         )
 
-
-                        subject_features, subject_labels = (
-                            process_deap_subject(
-                                file_bytes
-                            )
+                        (
+                            subject_features,
+                            subject_labels,
+                        ) = process_deap_subject(
+                            file_bytes
                         )
-
 
                         all_features.append(
                             subject_features
@@ -1229,36 +1028,28 @@ if dataset_choice == "DEAP":
                             filename
                         )
 
-
                         progress.progress(
-                            (
-                                index + 1
-                            )
-                            / len(
-                                dat_files
-                            )
+                            (index + 1)
+                            / len(dat_files)
                         )
 
-
-                    # ----------------------------------------
+                    # ------------------------------------------------
                     # COMBINE
-                    # ----------------------------------------
+                    # ------------------------------------------------
 
                     features = np.concatenate(
                         all_features,
                         axis=0,
                     )
 
-
                     labels = np.concatenate(
                         all_labels,
                         axis=0,
                     )
 
-
-                    # ----------------------------------------
+                    # ------------------------------------------------
                     # SESSION STATE
-                    # ----------------------------------------
+                    # ------------------------------------------------
 
                     st.session_state.processed_features = (
                         features
@@ -1285,11 +1076,8 @@ if dataset_choice == "DEAP":
                     )
 
                     st.session_state.processed_filename = (
-                        ", ".join(
-                            processed_names
-                        )
+                        ", ".join(processed_names)
                     )
-
 
                     status.update(
                         label="DEAP processing complete!",
@@ -1297,70 +1085,54 @@ if dataset_choice == "DEAP":
                         expanded=False,
                     )
 
-
-                    # ----------------------------------------
+                    # ------------------------------------------------
                     # RESULTS
-                    # ----------------------------------------
+                    # ------------------------------------------------
 
                     st.markdown(
-                        '<div class="section-title">Processing Complete</div>',
+                        '<div class="section-title">'
+                        'Processing Complete'
+                        '</div>',
                         unsafe_allow_html=True,
                     )
 
-
-                    c1, c2, c3, c4 = st.columns(
-                        4
-                    )
-
+                    c1, c2, c3, c4 = st.columns(4)
 
                     with c1:
-
                         st.metric(
                             "Trials",
                             features.shape[0],
                         )
 
-
                     with c2:
-
                         st.metric(
                             "Windows / Trial",
                             features.shape[1],
                         )
 
-
                     with c3:
-
                         st.metric(
                             "EEG Channels",
                             32,
                         )
 
-
                     with c4:
-
                         st.metric(
                             "Features / Channel",
                             10,
                         )
 
-
                     st.success(
-                        " DEAP dataset is ready."
+                        "DEAP dataset is ready."
                     )
-
 
                     st.write(
                         "Processed representation:"
                     )
 
-
                     st.code(
-                        str(
-                            features.shape
-                        )
+                        str(features.shape)
                     )
-
 
                 except Exception as error:
 
@@ -1383,10 +1155,11 @@ if dataset_choice == "DEAP":
 elif dataset_choice == "SEED":
 
     st.markdown(
-        '<div class="section-title">Step 2  Upload SEED Dataset</div>',
+        '<div class="section-title">'
+        'Step 2 — Upload SEED Dataset'
+        '</div>',
         unsafe_allow_html=True,
     )
-
 
     st.html(
         """
@@ -1403,17 +1176,17 @@ elif dataset_choice == "SEED":
                 <br><br>
 
                 <b>DatasetCaricatoNoImage.npz</b>
-                 EEG feature data
+                — EEG feature data
 
                 <br>
 
                 <b>LabelsNoImage.npz</b>
-                 emotion labels
+                — emotion labels
 
                 <br>
 
                 <b>SubjectsNoImage.npz</b>
-                 subject IDs
+                — subject IDs
 
                 <br><br>
 
@@ -1422,7 +1195,7 @@ elif dataset_choice == "SEED":
                 <br><br>
 
                 <b>
-                samples  5 frequency bands  62 channels
+                samples × 5 frequency bands × 62 channels
                 </b>
 
             </div>
@@ -1431,75 +1204,200 @@ elif dataset_choice == "SEED":
         """
     )
 
-
     uploaded_seed_files = st.file_uploader(
         "Upload SEED .npz files",
-        type=[
-            "npz",
-        ],
+        type=["npz"],
         accept_multiple_files=True,
         key="seed_upload_files",
     )
 
-        st.markdown('### Alternatively, skip upload:')
-        if st.button("Load Demo SEED Dataset", key="demo_seed_btn"):
-            with open("demo_data/DatasetNoImage.npz", "rb") as f1, open("demo_data/LabelsNoImage.npz", "rb") as f2, open("demo_data/SubjectsNoImage.npz", "rb") as f3:
-                data_bytes = f1.read()
-                labels_bytes = f2.read()
-                subjects_bytes = f3.read()
-            
-            data_array, labels_array, subjects_array = load_seed_arrays(data_bytes, labels_bytes, subjects_bytes)
-            
-            st.session_state.processed_features = data_array
-            st.session_state.processed_labels = labels_array
-            st.session_state.processed_subject_ids = subjects_array
-            st.session_state.dataset_type = "SEED"
-            st.session_state.dataset_processed = True
-            st.session_state.processed_source = "Demo SEED dataset"
-            st.session_state.processed_filename = "demo_dataset.npz"
-            st.success("Demo SEED Dataset successfully loaded!")
-            st.rerun()
+    # ========================================================
+    # OPTIONAL DEMO DATASET
+    # ========================================================
 
-        st.markdown('---')
+    st.markdown(
+        "### Alternatively, skip upload:"
+    )
 
+    demo_data_dir = (
+        Path(__file__).resolve().parent.parent
+        / "demo_data"
+    )
 
+    demo_data_candidates = [
+        demo_data_dir / "DatasetCaricatoNoImage.npz",
+        demo_data_dir / "DatasetNoImage.npz",
+    ]
+
+    demo_labels_candidates = [
+        demo_data_dir / "LabelsNoImage.npz",
+    ]
+
+    demo_subject_candidates = [
+        demo_data_dir / "SubjectsNoImage.npz",
+    ]
+
+    demo_data_path = next(
+        (
+            path
+            for path in demo_data_candidates
+            if path.exists()
+        ),
+        None,
+    )
+
+    demo_labels_path = next(
+        (
+            path
+            for path in demo_labels_candidates
+            if path.exists()
+        ),
+        None,
+    )
+
+    demo_subject_path = next(
+        (
+            path
+            for path in demo_subject_candidates
+            if path.exists()
+        ),
+        None,
+    )
+
+    demo_available = (
+        demo_data_path is not None
+        and demo_labels_path is not None
+        and demo_subject_path is not None
+    )
+
+    if demo_available:
+
+        if st.button(
+            "Load Demo SEED Dataset",
+            key="demo_seed_btn",
+        ):
+
+            try:
+
+                with open(
+                    demo_data_path,
+                    "rb",
+                ) as f1:
+
+                    data_bytes = f1.read()
+
+                with open(
+                    demo_labels_path,
+                    "rb",
+                ) as f2:
+
+                    labels_bytes = f2.read()
+
+                with open(
+                    demo_subject_path,
+                    "rb",
+                ) as f3:
+
+                    subjects_bytes = f3.read()
+
+                (
+                    data_array,
+                    labels_array,
+                    subjects_array,
+                ) = load_seed_arrays(
+                    data_bytes,
+                    labels_bytes,
+                    subjects_bytes,
+                )
+
+                st.session_state.processed_features = (
+                    data_array
+                )
+
+                st.session_state.processed_labels = (
+                    labels_array
+                )
+
+                st.session_state.processed_subject_ids = (
+                    subjects_array
+                )
+
+                st.session_state.dataset_type = (
+                    "SEED"
+                )
+
+                st.session_state.dataset_processed = (
+                    True
+                )
+
+                st.session_state.processed_source = (
+                    "Demo SEED dataset"
+                )
+
+                st.session_state.processed_filename = (
+                    "demo_dataset.npz"
+                )
+
+                st.success(
+                    "Demo SEED Dataset successfully loaded!"
+                )
+
+                st.rerun()
+
+            except Exception as error:
+
+                st.error(
+                    f"Could not load demo SEED dataset: "
+                    f"{error}"
+                )
+
+    else:
+
+        st.caption(
+            "No demo SEED dataset is available. "
+            "Upload the three .npz files below."
+        )
+
+    st.markdown("---")
+
+    # ========================================================
+    # UPLOADED SEED FILES
+    # ========================================================
 
     if uploaded_seed_files:
 
         st.markdown(
-            '<div class="section-title">Uploaded Files</div>',
+            '<div class="section-title">'
+            'Uploaded Files'
+            '</div>',
             unsafe_allow_html=True,
         )
-
 
         for file in uploaded_seed_files:
 
             size_mb = (
                 file.size
-                / (
-                    1024 * 1024
-                )
+                / (1024 * 1024)
             )
 
             st.write(
-                f" {file.name} "
-                f" {size_mb:.1f} MB"
+                f"{file.name} — "
+                f"{size_mb:.1f} MB"
             )
 
-
         st.markdown(
-            '<div class="section-title">Processing</div>',
+            '<div class="section-title">'
+            'Processing'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-
         process_seed = st.button(
-            " Process SEED Dataset",
+            "Process SEED Dataset",
             type="primary",
             use_container_width=True,
             key="process_seed_button",
         )
-
 
         if process_seed:
 
@@ -1514,17 +1412,15 @@ elif dataset_choice == "SEED":
                     labels_file = None
                     subjects_file = None
 
-
-                    # ----------------------------------------
+                    # --------------------------------------------
                     # IDENTIFY FILES BY NAME
-                    # ----------------------------------------
+                    # --------------------------------------------
 
                     for file in uploaded_seed_files:
 
                         filename = (
                             file.name.lower()
                         )
-
 
                         if (
                             "dataset"
@@ -1533,14 +1429,12 @@ elif dataset_choice == "SEED":
 
                             data_file = file
 
-
                         elif (
                             "label"
                             in filename
                         ):
 
                             labels_file = file
-
 
                         elif (
                             "subject"
@@ -1549,46 +1443,36 @@ elif dataset_choice == "SEED":
 
                             subjects_file = file
 
-
-                    # ----------------------------------------
-                    # FALLBACK
-                    # ----------------------------------------
+                    # --------------------------------------------
+                    # FALLBACK BY FILE ORDER
+                    # --------------------------------------------
 
                     if (
                         data_file is None
-                        and len(
-                            uploaded_seed_files
-                        ) >= 1
+                        and len(uploaded_seed_files) >= 1
                     ):
 
                         data_file = (
                             uploaded_seed_files[0]
                         )
 
-
                     if (
                         labels_file is None
-                        and len(
-                            uploaded_seed_files
-                        ) >= 2
+                        and len(uploaded_seed_files) >= 2
                     ):
 
                         labels_file = (
                             uploaded_seed_files[1]
                         )
 
-
                     if (
                         subjects_file is None
-                        and len(
-                            uploaded_seed_files
-                        ) >= 3
+                        and len(uploaded_seed_files) >= 3
                     ):
 
                         subjects_file = (
                             uploaded_seed_files[2]
                         )
-
 
                     if data_file is None:
 
@@ -1597,16 +1481,13 @@ elif dataset_choice == "SEED":
                             "was not found."
                         )
 
-
                     st.write(
                         "Loading SEED feature data..."
                     )
 
-
                     data_bytes = (
                         data_file.getvalue()
                     )
-
 
                     labels_bytes = (
                         labels_file.getvalue()
@@ -1614,13 +1495,11 @@ elif dataset_choice == "SEED":
                         else None
                     )
 
-
                     subjects_bytes = (
                         subjects_file.getvalue()
                         if subjects_file is not None
                         else None
                     )
-
 
                     (
                         data_array,
@@ -1632,10 +1511,9 @@ elif dataset_choice == "SEED":
                         subjects_bytes,
                     )
 
-
-                    # ----------------------------------------
+                    # --------------------------------------------
                     # SESSION STATE
-                    # ----------------------------------------
+                    # --------------------------------------------
 
                     st.session_state.processed_features = (
                         data_array
@@ -1664,11 +1542,9 @@ elif dataset_choice == "SEED":
                     st.session_state.processed_filename = (
                         ", ".join(
                             file.name
-                            for file
-                            in uploaded_seed_files
+                            for file in uploaded_seed_files
                         )
                     )
-
 
                     status.update(
                         label="SEED dataset loaded!",
@@ -1676,21 +1552,18 @@ elif dataset_choice == "SEED":
                         expanded=False,
                     )
 
-
-                    # ----------------------------------------
+                    # --------------------------------------------
                     # RESULTS
-                    # ----------------------------------------
+                    # --------------------------------------------
 
                     st.markdown(
-                        '<div class="section-title">Processing Complete</div>',
+                        '<div class="section-title">'
+                        'Processing Complete'
+                        '</div>',
                         unsafe_allow_html=True,
                     )
 
-
-                    c1, c2, c3, c4 = st.columns(
-                        4
-                    )
-
+                    c1, c2, c3, c4 = st.columns(4)
 
                     with c1:
 
@@ -1699,7 +1572,6 @@ elif dataset_choice == "SEED":
                             f"{data_array.shape[0]:,}",
                         )
 
-
                     with c2:
 
                         st.metric(
@@ -1707,14 +1579,12 @@ elif dataset_choice == "SEED":
                             data_array.shape[1],
                         )
 
-
                     with c3:
 
                         st.metric(
                             "EEG Channels",
                             data_array.shape[2],
                         )
-
 
                     with c4:
 
@@ -1730,29 +1600,22 @@ elif dataset_choice == "SEED":
 
                             subject_count = "N/A"
 
-
                         st.metric(
                             "Subjects",
                             subject_count,
                         )
 
-
                     st.success(
-                        " SEED dataset is ready."
+                        "SEED dataset is ready."
                     )
-
 
                     st.write(
                         "Processed representation:"
                     )
 
-
                     st.code(
-                        str(
-                            data_array.shape
-                        )
+                        str(data_array.shape)
                     )
-
 
                 except Exception as error:
 
@@ -1782,7 +1645,6 @@ if st.session_state.dataset_processed:
         st.session_state.processed_features
     )
 
-
     if active_features is not None:
 
         active_shape = (
@@ -1795,19 +1657,19 @@ if st.session_state.dataset_processed:
 
         active_shape = "Unavailable"
 
-
     st.markdown(
-        '<div class="section-title">Active Dataset</div>',
+        '<div class="section-title">'
+        'Active Dataset'
+        '</div>',
         unsafe_allow_html=True,
     )
-
 
     st.html(
         f"""
         <div class="success-card">
 
             <div class="success-title">
-                 {active_dataset} dataset is loaded
+                {active_dataset} dataset is loaded
             </div>
 
             <div class="success-text">
@@ -1820,11 +1682,12 @@ if st.session_state.dataset_processed:
                 The processed dataset is stored in the
                 current Streamlit session.
 
-                <br>
+                <br><br>
 
                 You can now open
                 <b>EEG Visualization</b>,
                 <b>Feature Analysis</b>,
+                <b>Emotion Prediction</b>,
                 and other pages without processing
                 the dataset again.
 
@@ -1833,4 +1696,3 @@ if st.session_state.dataset_processed:
         </div>
         """
     )
-

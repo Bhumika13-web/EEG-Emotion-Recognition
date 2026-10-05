@@ -1,6 +1,9 @@
 import streamlit as st
+
 import numpy as np
+
 import pandas as pd
+
 import plotly.express as px
 
 
@@ -299,7 +302,6 @@ if dataset_name == "DEAP":
 
         flattened_features = features.shape[2]
 
-
         if flattened_features != 320:
 
             st.error(
@@ -317,11 +319,9 @@ if dataset_name == "DEAP":
 
             st.stop()
 
-
         channels = 32
 
         feature_count = 10
-
 
         # ----------------------------------------------------
         # Convert:
@@ -340,7 +340,6 @@ if dataset_name == "DEAP":
             feature_count,
         )
 
-
     elif features.ndim == 4:
 
         trials = features.shape[0]
@@ -352,7 +351,6 @@ if dataset_name == "DEAP":
         feature_count = features.shape[3]
 
         features_4d = features
-
 
     else:
 
@@ -434,7 +432,7 @@ if dataset_name == "DEAP":
         <div class="success-card">
 
             <div class="success-title">
-                 DEAP dataset is active
+                DEAP dataset is active
             </div>
 
             <div class="success-text">
@@ -593,7 +591,6 @@ if dataset_name == "DEAP":
 
 
             # Project threshold
-
             # 5.0
 
             if valence_score >= 5.0:
@@ -701,7 +698,7 @@ if dataset_name == "DEAP":
 
     st.caption(
         "This window contains "
-        "32 EEG channels  10 features."
+        "32 EEG channels × 10 features."
     )
 
 
@@ -710,7 +707,7 @@ if dataset_name == "DEAP":
     # ========================================================
 
     st.markdown(
-        '<div class="section-title">Channel  Feature Heatmap</div>',
+        '<div class="section-title">Channel × Feature Heatmap</div>',
         unsafe_allow_html=True,
     )
 
@@ -724,7 +721,7 @@ if dataset_name == "DEAP":
 
     heatmap_fig = px.imshow(
         heatmap_df,
-        aspect="aut,
+        aspect="auto",
         color_continuous_scale="Blues",
         labels={
             "x": "EEG Channel",
@@ -737,7 +734,7 @@ if dataset_name == "DEAP":
     heatmap_fig.update_layout(
         title=(
             f"DEAP Trial {selected_trial} "
-            f" Window {selected_window}"
+            f" - Window {selected_window}"
         ),
         height=520,
         margin=dict(
@@ -946,12 +943,12 @@ if dataset_name == "DEAP":
 
                 <br>
 
-                 Differential Entropy (DE):
+                <b>Differential Entropy (DE):</b>
                 Delta, Theta, Alpha, Beta and Gamma
 
                 <br>
 
-                 Power Spectral Density (PSD):
+                <b>Power Spectral Density (PSD):</b>
                 Delta, Theta, Alpha, Beta and Gamma
 
                 <br><br>
@@ -961,7 +958,7 @@ if dataset_name == "DEAP":
                 <br><br>
 
                 <b>
-                32 channels  10 features = 320 values
+                32 channels × 10 features = 320 values
                 </b>
 
             </div>
@@ -1127,7 +1124,7 @@ elif dataset_name == "SEED":
         <div class="success-card">
 
             <div class="success-title">
-                 SEED dataset is active
+                SEED dataset is active
             </div>
 
             <div class="success-text">
@@ -1337,7 +1334,7 @@ elif dataset_name == "SEED":
     # ========================================================
 
     st.markdown(
-        '<div class="section-title">Channel  Frequency Band Heatmap</div>',
+        '<div class="section-title">Channel × Frequency Band Heatmap</div>',
         unsafe_allow_html=True,
     )
 
@@ -1351,7 +1348,7 @@ elif dataset_name == "SEED":
 
     seed_heatmap_fig = px.imshow(
         seed_heatmap,
-        aspect="aut,
+        aspect="auto",
         color_continuous_scale="Blues",
         labels={
             "x": "EEG Channel",
@@ -1552,7 +1549,7 @@ elif dataset_name == "SEED":
                 <br>
 
                 <b>
-                Delta  Theta  Alpha  Beta  Gamma
+                Delta · Theta · Alpha · Beta · Gamma
                 </b>
 
                 <br><br>
@@ -1562,7 +1559,7 @@ elif dataset_name == "SEED":
                 <br><br>
 
                 <b>
-                5 frequency bands  62 EEG channels
+                5 frequency bands × 62 EEG channels
                 </b>
 
                 <br><br>
@@ -1671,7 +1668,7 @@ st.markdown(
     <div class="footer">
         EEG based Emotion Recognition using
         Spatial-Temporal Representation Learning
-         DEAP + SEED
+        · DEAP + SEED
     </div>
     """,
     unsafe_allow_html=True,

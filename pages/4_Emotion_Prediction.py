@@ -50,87 +50,92 @@ SEED_MODEL = (
 
 
 # ============================================================
-# CSS
+# CUSTOM CSS
 # ============================================================
 
 st.markdown(
     """
-<style>
+    <style>
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    max-width: 1500px;
-}
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1500px;
+    }
 
-.page-title {
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 6px;
-}
+    .page-title {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        color: var(--st-heading-color);
+    }
 
-.page-subtitle {
-    font-size: 16px;
-    opacity: 0.70;
-    margin-bottom: 28px;
-}
+    .page-subtitle {
+        font-size: 16px;
+        opacity: 0.70;
+        margin-bottom: 28px;
+        color: var(--st-text-color);
+    }
 
-.section-title {
-    font-size: 22px;
-    font-weight: 750;
-    margin-top: 28px;
-    margin-bottom: 14px;
-}
+    .section-title {
+        font-size: 22px;
+        font-weight: 750;
+        margin-top: 28px;
+        margin-bottom: 14px;
+        color: var(--st-heading-color);
+    }
 
-.info-box {
-    padding: 18px;
-    border-radius: 12px;
-    border: 1px solid var(--st-border-color);
-    background: var(--st-secondary-background-color);
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+    .info-box {
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid var(--st-border-color);
+        background: var(--st-secondary-background-color);
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
-.info-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
+    .info-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--st-heading-color);
+    }
 
-.small-text {
-    font-size: 14px;
-    opacity: 0.75;
-    line-height: 1.7;
-}
+    .small-text {
+        font-size: 14px;
+        opacity: 0.75;
+        line-height: 1.7;
+        color: var(--st-text-color);
+    }
 
-.result-box {
-    padding: 22px;
-    border-radius: 14px;
-    border: 1px solid var(--st-border-color);
-    background: var(--st-secondary-background-color);
-    text-align: center;
-    min-height: 145px;
-}
+    .result-box {
+        padding: 22px;
+        border-radius: 14px;
+        border: 1px solid var(--st-border-color);
+        background: var(--st-secondary-background-color);
+        text-align: center;
+        min-height: 145px;
+    }
 
-.result-label {
-    font-size: 14px;
-    opacity: 0.65;
-    margin-bottom: 8px;
-}
+    .result-label {
+        font-size: 14px;
+        opacity: 0.65;
+        margin-bottom: 8px;
+    }
 
-.result-value {
-    font-size: 30px;
-    font-weight: 800;
-}
+    .result-value {
+        font-size: 30px;
+        font-weight: 800;
+    }
 
-.result-description {
-    font-size: 13px;
-    opacity: 0.65;
-    margin-top: 8px;
-}
+    .result-description {
+        font-size: 13px;
+        opacity: 0.65;
+        margin-top: 8px;
+    }
 
-</style>
-""",
+    </style>
+    """,
     unsafe_allow_html=True,
 )
 
@@ -169,29 +174,41 @@ def load_model(model_path):
     if not path.exists():
         return None
 
-    return joblib.load(path)
+    try:
+        return joblib.load(path)
+
+    except Exception:
+        return None
 
 
 # ============================================================
-# HELPER FUNCTIONS
+# DEAP FEATURE NORMALIZATION
 # ============================================================
 
 def normalize_deap_features(data):
     """
-    Expected final representation:
+    Expected DEAP representation:
 
-    trials  windows  channels  features
+        (trials, windows, channels, features)
 
     Example:
 
-    (40, 30, 32, 10)
+        (40, 30, 32, 10)
 
-    or
+    The dashboard also supports:
 
-    (40, 30, 320)
+        (trials, windows, 320)
+
+    where:
+
+        320 = 32 channels × 10 features
     """
 
     data = np.asarray(data)
+
+    # --------------------------------------------------------
+    # Already in 4D format
+    # --------------------------------------------------------
 
     if data.ndim == 4:
 
@@ -200,6 +217,10 @@ def normalize_deap_features(data):
             and data.shape[3] == 10
         ):
             return data
+
+    # --------------------------------------------------------
+    # Flattened 320-feature representation
+    # --------------------------------------------------------
 
     if data.ndim == 3:
 
@@ -217,10 +238,24 @@ def normalize_deap_features(data):
     )
 
 
+# ============================================================
+# DEAP LABEL
+# ============================================================
+
 def get_deap_label(
     label_array,
     trial_index
 ):
+    """
+    Return DEAP reference labels.
+
+    DEAP label columns:
+
+        0 = Valence
+        1 = Arousal
+        2 = Dominance
+        3 = Liking
+    """
 
     if label_array is None:
         return None
@@ -254,6 +289,7 @@ def get_deap_label(
 
     return {
         "valence_score": valence,
+
         "arousal_score": arousal,
 
         "valence_class": (
@@ -269,6 +305,10 @@ def get_deap_label(
         ),
     }
 
+
+# ============================================================
+# SEED LABEL
+# ============================================================
 
 def get_seed_label(
     label_array,
@@ -302,9 +342,28 @@ def get_seed_label(
     }
 
 
+# ============================================================
+# DEAP SVM INPUT
+# ============================================================
+
 def prepare_deap_svm_input(
     trial_features
 ):
+    """
+    SVM training used temporal mean features.
+
+    Input:
+
+        30 windows × 32 × 10
+
+    or:
+
+        30 windows × 320
+
+    Output:
+
+        1 × 320
+    """
 
     data = np.asarray(
         trial_features
@@ -334,9 +393,22 @@ def prepare_deap_svm_input(
     )
 
 
+# ============================================================
+# SEED SVM INPUT
+# ============================================================
+
 def prepare_seed_svm_input(
     sample
 ):
+    """
+    SEED representation:
+
+        5 frequency bands × 62 channels
+
+    SVM input:
+
+        1 × 310
+    """
 
     data = np.asarray(
         sample
@@ -366,8 +438,11 @@ st.markdown(
 st.markdown(
     """
     <div class="page-subtitle">
-        Predict emotional state from the processed EEG representation
-        and compare the prediction with the reference dataset label.
+
+        Predict emotional state from the processed EEG
+        representation and compare the prediction with
+        the reference dataset label.
+
     </div>
     """,
     unsafe_allow_html=True
@@ -404,12 +479,14 @@ st.markdown(
 
 col1, col2, col3 = st.columns(3)
 
+
 with col1:
 
     st.metric(
         "Dataset",
         dataset_type
     )
+
 
 with col2:
 
@@ -418,15 +495,16 @@ with col2:
         f"{len(features):,}"
     )
 
+
 with col3:
 
     if dataset_type == "DEAP":
 
-        representation = "30  32  10"
+        representation = "30 × 32 × 10"
 
     else:
 
-        representation = "5  62"
+        representation = "5 × 62"
 
     st.metric(
         "Representation",
@@ -440,9 +518,9 @@ with col3:
 
 if dataset_type == "DEAP":
 
-    # --------------------------------------------------------
+    # ========================================================
     # PREPARE DEAP
-    # --------------------------------------------------------
+    # ========================================================
 
     try:
 
@@ -459,9 +537,9 @@ if dataset_type == "DEAP":
         st.stop()
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # CONTROLS
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Prediction Controls</div>',
@@ -470,59 +548,74 @@ if dataset_type == "DEAP":
 
     col1, col2 = st.columns(2)
 
+
     with col1:
 
         trial_number = st.selectbox(
             "Select Trial",
+
             range(
                 1,
                 deap_features.shape[0] + 1
             ),
+
             key="deap_prediction_trial"
         )
+
 
     with col2:
 
         window_number = st.selectbox(
             "Select EEG Window",
+
             range(
                 1,
                 deap_features.shape[1] + 1
             ),
+
             key="deap_prediction_window"
         )
 
 
-    trial_index = trial_number - 1
+    trial_index = (
+        trial_number - 1
+    )
 
-    window_index = window_number - 1
+    window_index = (
+        window_number - 1
+    )
+
 
     selected_trial = deap_features[
         trial_index
     ]
+
 
     selected_window = selected_trial[
         window_index
     ]
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # REFERENCE LABEL
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Reference Emotion Label</div>',
         unsafe_allow_html=True
     )
 
+
     deap_label = get_deap_label(
         labels,
         trial_index
     )
 
+
     if deap_label is not None:
 
         col1, col2 = st.columns(2)
+
 
         with col1:
 
@@ -532,6 +625,7 @@ if dataset_type == "DEAP":
                 f"Score: {deap_label['valence_score']:.2f}"
             )
 
+
         with col2:
 
             st.metric(
@@ -540,6 +634,7 @@ if dataset_type == "DEAP":
                 f"Score: {deap_label['arousal_score']:.2f}"
             )
 
+
     else:
 
         st.warning(
@@ -547,18 +642,20 @@ if dataset_type == "DEAP":
         )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # MODEL PREDICTION
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Model Prediction</div>',
         unsafe_allow_html=True
     )
 
+
     valence_model = load_model(
         str(DEAP_VALENCE_MODEL)
     )
+
 
     arousal_model = load_model(
         str(DEAP_AROUSAL_MODEL)
@@ -566,6 +663,7 @@ if dataset_type == "DEAP":
 
 
     predicted_valence = None
+
     predicted_arousal = None
 
 
@@ -593,6 +691,7 @@ if dataset_type == "DEAP":
                 )[0]
             )
 
+
     except Exception as error:
 
         st.error(
@@ -600,7 +699,12 @@ if dataset_type == "DEAP":
         )
 
 
+    # ========================================================
+    # PREDICTION RESULTS
+    # ========================================================
+
     col1, col2 = st.columns(2)
+
 
     with col1:
 
@@ -648,16 +752,99 @@ if dataset_type == "DEAP":
             )
 
 
-    # --------------------------------------------------------
-    # INPUT INFORMATION
-    # --------------------------------------------------------
+    # ========================================================
+    # PREDICTION COMPARISON
+    # ========================================================
+
+    if (
+        deap_label is not None
+        and predicted_valence is not None
+        and predicted_arousal is not None
+    ):
+
+        st.markdown(
+            '<div class="section-title">Prediction Comparison</div>',
+            unsafe_allow_html=True
+        )
+
+
+        actual_valence = (
+            1
+            if deap_label["valence_score"]
+            >= DEAP_VALENCE_THRESHOLD
+            else 0
+        )
+
+
+        actual_arousal = (
+            1
+            if deap_label["arousal_score"]
+            >= DEAP_AROUSAL_THRESHOLD
+            else 0
+        )
+
+
+        valence_match = (
+            predicted_valence
+            == actual_valence
+        )
+
+
+        arousal_match = (
+            predicted_arousal
+            == actual_arousal
+        )
+
+
+        col1, col2 = st.columns(2)
+
+
+        with col1:
+
+            if valence_match:
+
+                st.success(
+                    "Valence prediction matches "
+                    "the reference label."
+                )
+
+            else:
+
+                st.warning(
+                    "Valence prediction does not "
+                    "match the reference label."
+                )
+
+
+        with col2:
+
+            if arousal_match:
+
+                st.success(
+                    "Arousal prediction matches "
+                    "the reference label."
+                )
+
+            else:
+
+                st.warning(
+                    "Arousal prediction does not "
+                    "match the reference label."
+                )
+
+
+    # ========================================================
+    # SELECTED EEG INPUT
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Selected EEG Input</div>',
         unsafe_allow_html=True
     )
 
+
     col1, col2, col3 = st.columns(3)
+
 
     with col1:
 
@@ -666,12 +853,14 @@ if dataset_type == "DEAP":
             trial_number
         )
 
+
     with col2:
 
         st.metric(
             "EEG Channels",
             32
         )
+
 
     with col3:
 
@@ -692,8 +881,12 @@ if dataset_type == "DEAP":
         <div class="small-text">
 
         Trial: <b>{trial_number}</b><br>
+
         Window: <b>{window_number}</b><br>
-        Input shape: <b>{selected_window.shape}</b><br>
+
+        Input shape:
+        <b>{selected_window.shape}</b><br>
+
         Representation:
         <b>Differential Entropy + PSD</b>
 
@@ -705,29 +898,34 @@ if dataset_type == "DEAP":
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # MODEL INFORMATION
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Model Information</div>',
         unsafe_allow_html=True
     )
 
+
     st.info(
         """
         DEAP prediction uses the trained SVM baseline models.
 
         Input:
-        30 temporal windows  32 EEG channels  10 features.
+
+        30 temporal windows × 32 EEG channels × 10 features.
 
         Features:
+
         Differential Entropy + PSD.
 
         Classification:
+
         Binary Valence and Arousal.
 
         Threshold:
+
         5.0.
         """
     )
@@ -744,9 +942,9 @@ elif dataset_type == "SEED":
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # VALIDATE SEED
-    # --------------------------------------------------------
+    # ========================================================
 
     if seed_features.ndim != 3:
 
@@ -759,7 +957,10 @@ elif dataset_type == "SEED":
         st.stop()
 
 
-    if seed_features.shape[1:] != (5, 62):
+    if seed_features.shape[1:] != (
+        5,
+        62
+    ):
 
         st.error(
             "Expected SEED representation "
@@ -770,40 +971,47 @@ elif dataset_type == "SEED":
         st.stop()
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # CONTROLS
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Prediction Controls</div>',
         unsafe_allow_html=True
     )
 
+
     sample_number = st.selectbox(
         "Select SEED Sample",
+
         range(
             1,
             len(seed_features) + 1
         ),
+
         key="seed_prediction_sample"
     )
 
 
-    sample_index = sample_number - 1
+    sample_index = (
+        sample_number - 1
+    )
+
 
     selected_sample = seed_features[
         sample_index
     ]
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # REFERENCE LABEL
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Reference Emotion Label</div>',
         unsafe_allow_html=True
     )
+
 
     seed_label = get_seed_label(
         labels,
@@ -815,6 +1023,7 @@ elif dataset_type == "SEED":
 
         col1, col2 = st.columns(2)
 
+
         with col1:
 
             st.metric(
@@ -822,12 +1031,14 @@ elif dataset_type == "SEED":
                 seed_label["emotion"]
             )
 
+
         with col2:
 
             st.metric(
                 "Class ID",
                 seed_label["class_id"]
             )
+
 
     else:
 
@@ -842,15 +1053,17 @@ elif dataset_type == "SEED":
             Please return to Upload Dataset and process:
 
             DatasetCaricatoNoImage.npz
+
             LabelsNoImage.npz
+
             SubjectsNoImage.npz
             """
         )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # MODEL PREDICTION
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Model Prediction</div>',
@@ -864,6 +1077,7 @@ elif dataset_type == "SEED":
 
 
     predicted_class = None
+
     predicted_emotion = None
 
 
@@ -875,11 +1089,13 @@ elif dataset_type == "SEED":
                 selected_sample
             )
 
+
             predicted_class = int(
                 seed_model.predict(
                     model_input
                 )[0]
             )
+
 
             predicted_emotion = (
                 SEED_EMOTION_MAP.get(
@@ -888,11 +1104,13 @@ elif dataset_type == "SEED":
                 )
             )
 
+
         except Exception as error:
 
             st.error(
                 f"SEED prediction failed: {error}"
             )
+
 
     else:
 
@@ -901,9 +1119,14 @@ elif dataset_type == "SEED":
         )
 
 
+    # ========================================================
+    # SEED PREDICTION RESULT
+    # ========================================================
+
     if predicted_emotion is not None:
 
         col1, col2 = st.columns(2)
+
 
         with col1:
 
@@ -911,6 +1134,7 @@ elif dataset_type == "SEED":
                 "Predicted Emotion",
                 predicted_emotion
             )
+
 
         with col2:
 
@@ -920,9 +1144,9 @@ elif dataset_type == "SEED":
             )
 
 
-    # --------------------------------------------------------
-    # COMPARISON
-    # --------------------------------------------------------
+    # ========================================================
+    # SEED COMPARISON
+    # ========================================================
 
     if (
         seed_label is not None
@@ -935,7 +1159,10 @@ elif dataset_type == "SEED":
         )
 
 
-        if predicted_class == seed_label["class_id"]:
+        if (
+            predicted_class
+            == seed_label["class_id"]
+        ):
 
             st.success(
                 "Prediction matches the reference emotion."
@@ -948,9 +1175,9 @@ elif dataset_type == "SEED":
             )
 
 
-    # --------------------------------------------------------
-    # SELECTED INPUT
-    # --------------------------------------------------------
+    # ========================================================
+    # SELECTED EEG INPUT
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Selected EEG Input</div>',
@@ -960,6 +1187,7 @@ elif dataset_type == "SEED":
 
     col1, col2, col3 = st.columns(3)
 
+
     with col1:
 
         st.metric(
@@ -967,12 +1195,14 @@ elif dataset_type == "SEED":
             sample_number
         )
 
+
     with col2:
 
         st.metric(
             "Frequency Bands",
             5
         )
+
 
     with col3:
 
@@ -1000,11 +1230,13 @@ elif dataset_type == "SEED":
         <br><br>
 
         Frequency bands:
+
         <b>Delta, Theta, Alpha, Beta, Gamma</b>
 
         <br><br>
 
         Input shape:
+
         <b>(5, 62)</b>
 
         </div>
@@ -1015,9 +1247,9 @@ elif dataset_type == "SEED":
     )
 
 
-    # --------------------------------------------------------
-    # EMOTION CLASSES
-    # --------------------------------------------------------
+    # ========================================================
+    # SEED EMOTION CLASSES
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">SEED Emotion Classes</div>',
@@ -1027,6 +1259,7 @@ elif dataset_type == "SEED":
 
     col1, col2, col3 = st.columns(3)
 
+
     with col1:
 
         st.metric(
@@ -1034,12 +1267,14 @@ elif dataset_type == "SEED":
             "Negative"
         )
 
+
     with col2:
 
         st.metric(
             "Class 1",
             "Neutral"
         )
+
 
     with col3:
 
@@ -1049,9 +1284,9 @@ elif dataset_type == "SEED":
         )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # MODEL INFORMATION
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Model Information</div>',
@@ -1064,17 +1299,23 @@ elif dataset_type == "SEED":
         SEED prediction uses the trained SVM baseline model.
 
         Input:
-        5 frequency bands  62 EEG channels.
+
+        5 frequency bands × 62 EEG channels.
 
         Classes:
+
         Negative / Neutral / Positive.
 
         Class mapping:
-        0 = Negative,
-        1 = Neutral,
-        2 = Positive.
+
+        0 = Negative
+
+        1 = Neutral
+
+        2 = Positive
 
         Model:
+
         RBF SVM.
         """
     )
@@ -1089,34 +1330,168 @@ else:
     st.error(
         f"Unsupported dataset type: {dataset_type}"
     )
+
+
 # ============================================================
-# DOWNLOAD RESULTS
+# EXPORT RESULTS
 # ============================================================
 
-st.markdown('<div class="section-title">Export Results</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="section-title">Export Results</div>',
+    unsafe_allow_html=True
+)
 
-import pandas as pd
 
-if dataset_type == "DEAP" and 'predicted_valence' in locals() and predicted_valence is not None:
-    results_df = pd.DataFrame([{
-        "Trial": trial_number,
-        "Window": window_number,
-        "Predicted_Valence": "High" if predicted_valence == 1 else "Low",
-        "Predicted_Arousal": "High" if predicted_arousal == 1 else "Low",
-        "Actual_Valence": "High" if deap_label["valence"] > 5 else "Low",
-        "Actual_Arousal": "High" if deap_label["arousal"] > 5 else "Low"
-    }])
-    csv = results_df.to_csv(index=False).encode('utf-8')
-    st.download_button("Download DEAP Prediction (CSV)", csv, "deap_prediction.csv", "text/csv")
-    
-elif dataset_type == "SEED" and 'predicted_class' in locals() and predicted_class is not None:
-    results_df = pd.DataFrame([{
-        "Sample": sample_number,
-        "Predicted_Class": predicted_class,
-        "Predicted_Emotion": predicted_emotion,
-        "Actual_Class": seed_label["class_id"],
-        "Actual_Emotion": seed_label["emotion"]
-    }])
-    csv = results_df.to_csv(index=False).encode('utf-8')
-    st.download_button("Download SEED Prediction (CSV)", csv, "seed_prediction.csv", "text/csv")
+# ============================================================
+# DEAP EXPORT
+# ============================================================
 
+if (
+    dataset_type == "DEAP"
+    and "predicted_valence" in locals()
+    and "predicted_arousal" in locals()
+    and predicted_valence is not None
+    and predicted_arousal is not None
+    and deap_label is not None
+):
+
+    results_df = st.session_state.get(
+        "deap_export_dataframe"
+    )
+
+
+    actual_valence = (
+        "High"
+        if deap_label["valence_score"]
+        >= DEAP_VALENCE_THRESHOLD
+        else "Low"
+    )
+
+
+    actual_arousal = (
+        "High"
+        if deap_label["arousal_score"]
+        >= DEAP_AROUSAL_THRESHOLD
+        else "Low"
+    )
+
+
+    results_df = __import__(
+        "pandas"
+    ).DataFrame(
+        [
+            {
+                "Trial": trial_number,
+
+                "Window": window_number,
+
+                "Predicted_Valence": (
+                    "High"
+                    if predicted_valence == 1
+                    else "Low"
+                ),
+
+                "Predicted_Arousal": (
+                    "High"
+                    if predicted_arousal == 1
+                    else "Low"
+                ),
+
+                "Actual_Valence": actual_valence,
+
+                "Actual_Arousal": actual_arousal,
+
+                "Valence_Score": (
+                    deap_label["valence_score"]
+                ),
+
+                "Arousal_Score": (
+                    deap_label["arousal_score"]
+                ),
+            }
+        ]
+    )
+
+
+    csv = results_df.to_csv(
+        index=False
+    ).encode(
+        "utf-8"
+    )
+
+
+    st.download_button(
+        "Download DEAP Prediction (CSV)",
+
+        csv,
+
+        "deap_prediction.csv",
+
+        "text/csv",
+
+        key="download_deap_prediction"
+    )
+
+
+# ============================================================
+# SEED EXPORT
+# ============================================================
+
+elif (
+    dataset_type == "SEED"
+    and "predicted_class" in locals()
+    and predicted_class is not None
+    and seed_label is not None
+):
+
+    import pandas as pd
+
+
+    results_df = pd.DataFrame(
+        [
+            {
+                "Sample": sample_number,
+
+                "Predicted_Class": predicted_class,
+
+                "Predicted_Emotion": predicted_emotion,
+
+                "Actual_Class": (
+                    seed_label["class_id"]
+                ),
+
+                "Actual_Emotion": (
+                    seed_label["emotion"]
+                ),
+            }
+        ]
+    )
+
+
+    csv = results_df.to_csv(
+        index=False
+    ).encode(
+        "utf-8"
+    )
+
+
+    st.download_button(
+        "Download SEED Prediction (CSV)",
+
+        csv,
+
+        "seed_prediction.csv",
+
+        "text/csv",
+
+        key="download_seed_prediction"
+    )
+
+
+else:
+
+    st.caption(
+        "Prediction results will appear here "
+        "after a valid model prediction and reference label "
+        "are available."
+    )
