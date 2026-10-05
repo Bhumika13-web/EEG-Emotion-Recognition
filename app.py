@@ -37,7 +37,7 @@ if "processed_features" not in st.session_state:
 if "processed_labels" not in st.session_state:
     st.session_state.processed_labels = None
 
-if "dataset_info" not in st.session_state:
+if "dataset_inf✓ not in st.session_state:
     st.session_state.dataset_info = {}
 
 
@@ -435,7 +435,7 @@ with st.sidebar:
 
 st.html(
     """
-    <div class="hero">
+    <div class="her✓>
 
         <div class="hero-title">
             🧠 EEG Emotion Recognition

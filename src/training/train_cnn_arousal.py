@@ -308,7 +308,7 @@ def evaluate(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -322,14 +322,14 @@ def evaluate(
     macro_precision = precision_score(
         all_labels,
         all_predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
     macro_recall = recall_score(
         all_labels,
         all_predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -475,7 +475,7 @@ def train_one_epoch(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -828,7 +828,7 @@ def main():
         val_macro_f1 = f1_score(
             val_targets,
             val_predictions,
-            average="macro",
+            average="macr✓,
             zero_division=0
         )
 

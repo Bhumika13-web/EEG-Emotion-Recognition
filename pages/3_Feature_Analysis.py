@@ -767,7 +767,7 @@ fig_emotion.add_trace(
             f"{value:.4f}"
             for value in values
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 

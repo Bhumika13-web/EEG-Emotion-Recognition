@@ -884,7 +884,7 @@ def calculate_metrics(
     macro_f1 = f1_score(
         y_true,
         y_pred,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -898,14 +898,14 @@ def calculate_metrics(
     macro_precision = precision_score(
         y_true,
         y_pred,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
     macro_recall = recall_score(
         y_true,
         y_pred,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 

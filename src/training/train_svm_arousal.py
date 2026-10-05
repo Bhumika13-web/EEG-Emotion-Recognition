@@ -190,7 +190,7 @@ def evaluate(model, X, y, name):
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -204,14 +204,14 @@ def evaluate(model, X, y, name):
     macro_precision = precision_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
     macro_recall = recall_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 

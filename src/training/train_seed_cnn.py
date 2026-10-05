@@ -304,7 +304,7 @@ def evaluate(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macro"
+        average="macr✓
     )
 
     weighted_f1 = f1_score(

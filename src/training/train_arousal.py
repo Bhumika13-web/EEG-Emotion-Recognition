@@ -260,7 +260,7 @@ def evaluate(
     macro_f1 = f1_score(
         targets,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -274,14 +274,14 @@ def evaluate(
     precision = precision_score(
         targets,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
     recall = recall_score(
         targets,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -641,7 +641,7 @@ def main():
         train_macro_f1 = f1_score(
             train_targets,
             train_predictions,
-            average="macro",
+            average="macr✓,
             zero_division=0
         )
 

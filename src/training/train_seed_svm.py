@@ -85,7 +85,7 @@ def evaluate_model(model, X, y, name):
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macro"
+        average="macr✓
     )
 
     weighted_f1 = f1_score(

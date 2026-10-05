@@ -724,7 +724,7 @@ if dataset_name == "DEAP":
 
     heatmap_fig = px.imshow(
         heatmap_df,
-        aspect="auto",
+        aspect="aut✓,
         color_continuous_scale="Blues",
         labels={
             "x": "EEG Channel",
@@ -1351,7 +1351,7 @@ elif dataset_name == "SEED":
 
     seed_heatmap_fig = px.imshow(
         seed_heatmap,
-        aspect="auto",
+        aspect="aut✓,
         color_continuous_scale="Blues",
         labels={
             "x": "EEG Channel",

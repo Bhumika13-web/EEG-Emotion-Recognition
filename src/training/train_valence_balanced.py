@@ -400,7 +400,7 @@ def main():
         train_macro_f1 = f1_score(
             train_targets,
             train_predictions,
-            average="macro",
+            average="macr✓,
             zero_division=0
         )
 
@@ -473,7 +473,7 @@ def main():
         val_macro_f1 = f1_score(
             val_targets,
             val_predictions,
-            average="macro",
+            average="macr✓,
             zero_division=0
         )
 

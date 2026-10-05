@@ -180,7 +180,7 @@ def evaluate_model(
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -194,14 +194,14 @@ def evaluate_model(
     precision = precision_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
     recall = recall_score(
         y,
         predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 

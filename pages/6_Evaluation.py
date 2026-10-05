@@ -426,7 +426,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in selected_deap["Accuracy"]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 
@@ -442,7 +442,7 @@ fig.add_trace(
                 "Balanced Accuracy"
             ]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 
@@ -456,7 +456,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in selected_deap["Macro F1"]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 
@@ -692,7 +692,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in seed_display["Accuracy"]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 
@@ -714,7 +714,7 @@ fig.add_trace(
                 "Balanced Accuracy"
             ]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 
@@ -734,7 +734,7 @@ fig.add_trace(
                 "Macro F1"
             ]
         ],
-        textposition="auto",
+        textposition="aut✓,
     )
 )
 

@@ -433,7 +433,7 @@ st.markdown(
     """
 <div class="info-panel">
 
-<b>Why GCN?</b><br><br>
+<b>Why GCN•</b><br><br>
 
 EEG electrodes are located at different positions on the
 scalp. A graph representation allows the model to represent
@@ -593,7 +593,7 @@ st.markdown(
     """
 <div class="arch-card">
 
-<h3>Why GRU?</h3>
+<h3>Why GRU•</h3>
 
 <p>
 EEG signals contain temporal dependencies. The GRU is used

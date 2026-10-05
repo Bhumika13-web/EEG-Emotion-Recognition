@@ -176,7 +176,7 @@ def analyze_split(name, data):
     majority_macro_f1 = f1_score(
         labels,
         majority_predictions,
-        average="macro",
+        average="macr✓,
         zero_division=0
     )
 
@@ -483,7 +483,7 @@ balanced_accuracy = (
 macro_f1 = f1_score(
     current_labels,
     current_predictions,
-    average="macro",
+    average="macr✓,
     zero_division=0
 )
 
@@ -583,7 +583,7 @@ baseline_balanced_accuracy = (
 baseline_macro_f1 = f1_score(
     test_labels,
     baseline_predictions,
-    average="macro",
+    average="macr✓,
     zero_division=0
 )
 
