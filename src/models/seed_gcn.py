@@ -264,10 +264,10 @@ class BatchedSEEDGCN(
     SEED Graph Convolutional Network.
 
     Input:
-        B × 62 × 5
+        B  62  5
 
     Output:
-        B × 3
+        B  3
     """
 
     def __init__(
@@ -394,11 +394,11 @@ class BatchedSEEDGCN(
         # ----------------------------------------------------
         # Reshape
         #
-        # B * 62 × 64
+        # B * 62  64
         #
-        # →
+        # 
         #
-        # B × 62 × 64
+        # B  62  64
         # ----------------------------------------------------
 
         x = x.reshape(
@@ -410,11 +410,11 @@ class BatchedSEEDGCN(
         # ----------------------------------------------------
         # Global mean pooling
         #
-        # B × 62 × 64
+        # B  62  64
         #
-        # →
+        # 
         #
-        # B × 64
+        # B  64
         # ----------------------------------------------------
 
         x = x.mean(
@@ -592,7 +592,7 @@ def load_graph():
     )
 
     print(
-        "✓ Graph loaded successfully."
+        " Graph loaded successfully."
     )
 
     return edge_index
@@ -619,7 +619,7 @@ def create_batched_edge_index(
             62 nodes
 
         Batch of 256:
-            256 × 62 = 15,872 nodes
+            256  62 = 15,872 nodes
     """
 
     edge_index = edge_index.to(
@@ -633,9 +633,9 @@ def create_batched_edge_index(
     # --------------------------------------------------------
     # Offsets for every graph
     #
-    # Graph 0 → +0
-    # Graph 1 → +62
-    # Graph 2 → +124
+    # Graph 0  +0
+    # Graph 1  +62
+    # Graph 2  +124
     # ...
     # --------------------------------------------------------
 
@@ -664,11 +664,11 @@ def create_batched_edge_index(
 
     # Shape:
     #
-    # batch × 2 × edges
+    # batch  2  edges
     #
     # Convert to:
     #
-    # 2 × (batch × edges)
+    # 2  (batch  edges)
     # --------------------------------------------------------
 
     batched_edges = (
@@ -706,9 +706,9 @@ def forward_batch(
 
     Convert:
         (B, 5, 62)
-        ↓
+        
         (B, 62, 5)
-        ↓
+        
         (B*62, 5)
 
     Output:
@@ -725,11 +725,11 @@ def forward_batch(
     # --------------------------------------------------------
     # Convert:
     #
-    # B × 5 × 62
+    # B  5  62
     #
-    # →
+    # 
     #
-    # B × 62 × 5
+    # B  62  5
     # --------------------------------------------------------
 
     x = x.transpose(
@@ -740,11 +740,11 @@ def forward_batch(
     # --------------------------------------------------------
     # Flatten nodes
     #
-    # B × 62 × 5
+    # B  62  5
     #
-    # →
+    # 
     #
-    # (B*62) × 5
+    # (B*62)  5
     # --------------------------------------------------------
 
     x = x.reshape(
@@ -884,7 +884,7 @@ def calculate_metrics(
     macro_f1 = f1_score(
         y_true,
         y_pred,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -898,14 +898,14 @@ def calculate_metrics(
     macro_precision = precision_score(
         y_true,
         y_pred,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
     macro_recall = recall_score(
         y_true,
         y_pred,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -1682,7 +1682,7 @@ def main():
             )
 
             print(
-                f"✓ Best model saved "
+                f" Best model saved "
                 f"(Val Macro F1: "
                 f"{best_val_f1:.4f})"
             )

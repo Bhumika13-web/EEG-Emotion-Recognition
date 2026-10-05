@@ -59,7 +59,7 @@ def aggregate_features(features):
 
     Each sample therefore contains:
 
-        32 EEG electrodes × 10 DE/PSD features
+        32 EEG electrodes  10 DE/PSD features
     """
 
     if features.ndim != 4:
@@ -180,7 +180,7 @@ def evaluate_model(
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -194,14 +194,14 @@ def evaluate_model(
     precision = precision_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
     recall = recall_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -279,7 +279,7 @@ def evaluate_model(
 def main():
 
     print("=" * 70)
-    print("SVM BASELINE — DEAP VALENCE")
+    print("SVM BASELINE  DEAP VALENCE")
     print("=" * 70)
 
     # --------------------------------------------------------
@@ -402,7 +402,7 @@ def main():
         y_train
     )
 
-    print("✓ SVM training completed.")
+    print(" SVM training completed.")
 
     # ========================================================
     # VALIDATION

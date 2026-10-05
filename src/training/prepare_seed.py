@@ -156,7 +156,7 @@ def normalize_features(X_train, X_val, X_test):
 
     # Flatten each sample:
     #
-    # 5 × 62 = 310 features
+    # 5  62 = 310 features
     #
     X_train_flat = X_train.reshape(n_train, -1)
     X_val_flat = X_val.reshape(n_val, -1)
@@ -168,7 +168,7 @@ def normalize_features(X_train, X_val, X_test):
     X_val_flat = scaler.transform(X_val_flat)
     X_test_flat = scaler.transform(X_test_flat)
 
-    # Restore original 5 × 62 structure
+    # Restore original 5  62 structure
 
     X_train = X_train_flat.reshape(
         n_train,
@@ -335,7 +335,7 @@ Test:
     Samples  : 10,182
 
 Feature representation:
-    5 frequency bands × 62 EEG electrodes
+    5 frequency bands  62 EEG electrodes
 
 Classes:
     0 = Negative

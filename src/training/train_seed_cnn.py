@@ -304,7 +304,7 @@ def evaluate(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macr✓
+        average="macr
     )
 
     weighted_f1 = f1_score(
@@ -536,7 +536,7 @@ def train_model(
             )
 
             print(
-                f"✓ Best model saved "
+                f" Best model saved "
                 f"(Macro F1: "
                 f"{best_macro_f1:.4f})"
             )

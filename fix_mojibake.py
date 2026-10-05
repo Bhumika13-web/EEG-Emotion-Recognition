@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 def fix_mojibake(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
@@ -6,12 +6,12 @@ def fix_mojibake(filepath):
     
     original = content
     # Replace known mojibake manually
-    content = content.replace('\xf0\u0178\xa7\xa0', '🧠')
-    content = content.replace('\xf0\u0178\u201d\u0161', '📈')
-    content = content.replace('\xf0\u0178\u201c\u0161', '📈')
-    content = content.replace('\xf0\u0178\u02dc\u201c', '📈')
+    content = content.replace('\xf0\u0178\xa7\xa0', '')
+    content = content.replace('\xf0\u0178\u201d\u0161', '')
+    content = content.replace('\xf0\u0178\u201c\u0161', '')
+    content = content.replace('\xf0\u0178\u02dc\u201c', '')
     # Let's just catch the st.set_page_config ones:
-    content = content.replace('page_icon="\xf0\u0178\xa7\xa0"', 'page_icon="🧠"')
+    content = content.replace('page_icon="\xf0\u0178\xa7\xa0"', 'page_icon=""')
     
     # Also fix st.success
     content = content.replace('\xe2\u20ac\u0153', '"')

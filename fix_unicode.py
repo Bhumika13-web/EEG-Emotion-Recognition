@@ -1,4 +1,4 @@
-﻿import os
+import os
 import glob
 
 def fix_file(filepath):
@@ -7,9 +7,9 @@ def fix_file(filepath):
     
     # Replace the corrupted characters exactly as they appear
     original = content
-    content = content.replace('🧠', '🧠')
-    content = content.replace('✓', '✓')
-    content = content.replace('•', '•')
+    content = content.replace('', '')
+    content = content.replace('', '')
+    content = content.replace('', '')
     content = content.replace('', '')
     
     if original != content:

@@ -109,7 +109,7 @@ for file_path in [DATA_FILE, LABEL_FILE, SUBJECT_FILE]:
             f"Please check your SEED data directory."
         )
 
-print("\n✓ All SEED files found.")
+print("\n All SEED files found.")
 
 
 # ============================================================
@@ -140,7 +140,7 @@ print(f"Subjects shape : {subjects.shape}")
 if len(data) != len(labels) or len(data) != len(subjects):
     raise ValueError("Data, labels and subjects do not have the same number of samples.")
 
-print("\n✓ Number of samples matches across all files.")
+print("\n Number of samples matches across all files.")
 
 
 # ============================================================
@@ -220,10 +220,10 @@ for subject in unique_subjects:
 
     if not np.array_equal(indices, expected):
         contiguous = False
-        print(f"✗ Subject {subject} is NOT contiguous.")
+        print(f" Subject {subject} is NOT contiguous.")
 
 if contiguous:
-    print("\n✓ Every subject occupies one contiguous block.")
+    print("\n Every subject occupies one contiguous block.")
 
 
 # ============================================================
@@ -401,13 +401,13 @@ for subject in unique_subjects:
             continuity_ok = False
 
             print(
-                f"✗ Subject {subject}: "
+                f" Subject {subject}: "
                 "indices are not consecutive."
             )
 
 if continuity_ok:
     print(
-        "\n✓ Samples belonging to each subject are "
+        "\n Samples belonging to each subject are "
         "stored consecutively."
     )
 
@@ -473,7 +473,7 @@ print(f"NaN values in labels: {np.isnan(labels).sum()}")
 print(f"NaN values in subjects: {np.isnan(subjects).sum()}")
 
 if not np.isnan(data).any() and not np.isinf(data).any():
-    print("\n✓ No NaN or Inf values found in EEG features.")
+    print("\n No NaN or Inf values found in EEG features.")
 
 
 # ============================================================
@@ -519,4 +519,4 @@ Before implementing GCN + GRU, use these results to determine
 whether the samples can safely be grouped into temporal sequences.
 """)
 
-print("\n✓ Temporal inspection completed successfully.")
+print("\n Temporal inspection completed successfully.")

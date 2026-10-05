@@ -250,7 +250,7 @@ def calculate_de(window):
             de
         )
 
-    # Five bands × 32 channels
+    # Five bands  32 channels
     #
     # Result:
     # (32, 5)

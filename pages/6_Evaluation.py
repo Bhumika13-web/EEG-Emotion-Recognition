@@ -426,7 +426,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in selected_deap["Accuracy"]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -442,7 +442,7 @@ fig.add_trace(
                 "Balanced Accuracy"
             ]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -456,7 +456,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in selected_deap["Macro F1"]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -498,7 +498,7 @@ best_f1_row = selected_deap.loc[
 
 
 st.subheader(
-    f"Best DEAP Results — {deap_task}"
+    f"Best DEAP Results  {deap_task}"
 )
 
 
@@ -692,7 +692,7 @@ fig.add_trace(
             f"{x:.2f}%"
             for x in seed_display["Accuracy"]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -714,7 +714,7 @@ fig.add_trace(
                 "Balanced Accuracy"
             ]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -734,7 +734,7 @@ fig.add_trace(
                 "Macro F1"
             ]
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -769,7 +769,7 @@ st.markdown(
 <div class="best-card">
 
 <div class="best-title">
-GCN — Best Overall SEED Model
+GCN  Best Overall SEED Model
 </div>
 
 <div class="best-text">
@@ -866,7 +866,7 @@ fig_cm = go.Figure(
 
 
 fig_cm.update_layout(
-    title=f"{selected_seed_cm} — Test Confusion Matrix",
+    title=f"{selected_seed_cm}  Test Confusion Matrix",
     height=500,
 )
 
@@ -1023,7 +1023,7 @@ fig.add_trace(
 
 
 fig.update_layout(
-    title=f"{selected_seed_cm} — Class-wise Performance",
+    title=f"{selected_seed_cm}  Class-wise Performance",
     yaxis_title="Score (%)",
     yaxis_range=[0, 100],
     barmode="group",
@@ -1197,5 +1197,5 @@ improvement.
 st.markdown("---")
 
 st.caption(
-    "Evaluation • DEAP + SEED • Accuracy • Balanced Accuracy • Macro F1"
+    "Evaluation  DEAP + SEED  Accuracy  Balanced Accuracy  Macro F1"
 )

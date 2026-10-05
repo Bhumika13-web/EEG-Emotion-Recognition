@@ -260,7 +260,7 @@ def evaluate(
     macro_f1 = f1_score(
         targets,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -274,14 +274,14 @@ def evaluate(
     precision = precision_score(
         targets,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
     recall = recall_score(
         targets,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -307,7 +307,7 @@ def main():
     global edge_index
 
     print("=" * 70)
-    print("GCN + GRU — DEAP AROUSAL")
+    print("GCN + GRU  DEAP AROUSAL")
     print("=" * 70)
 
     # --------------------------------------------------------
@@ -641,7 +641,7 @@ def main():
         train_macro_f1 = f1_score(
             train_targets,
             train_predictions,
-            average="macr✓,
+            average="macr,
             zero_division=0
         )
 
@@ -764,7 +764,7 @@ def main():
             )
 
             print(
-                "✓ BEST MODEL SAVED"
+                " BEST MODEL SAVED"
             )
 
         else:

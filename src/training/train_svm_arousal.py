@@ -127,14 +127,14 @@ def prepare_features(features):
         Average the 30 temporal windows
 
         (N, 30, 32, 10)
-                  ↓
+                  
         (N, 32, 10)
 
         Step 2:
-        Flatten electrode × feature dimensions
+        Flatten electrode  feature dimensions
 
         (N, 32, 10)
-                  ↓
+                  
         (N, 320)
     """
 
@@ -190,7 +190,7 @@ def evaluate(model, X, y, name):
     macro_f1 = f1_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -204,14 +204,14 @@ def evaluate(model, X, y, name):
     macro_precision = precision_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
     macro_recall = recall_score(
         y,
         predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -376,7 +376,7 @@ def main():
         )
 
     print(
-        "\n✓ Training data contains both "
+        "\n Training data contains both "
         "arousal classes."
     )
 
@@ -464,7 +464,7 @@ def main():
         train_labels
     )
 
-    print("✓ Training completed.")
+    print(" Training completed.")
 
     # ========================================================
     # VALIDATION

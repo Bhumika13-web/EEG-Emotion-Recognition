@@ -167,13 +167,13 @@ def prepare_features(features):
     We average the 30 temporal windows:
 
         (N, 30, 32, 10)
-              ↓
+              
         (N, 32, 10)
 
     Then add a CNN channel dimension:
 
         (N, 32, 10)
-              ↓
+              
         (N, 1, 32, 10)
     """
 
@@ -308,7 +308,7 @@ def evaluate(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -322,14 +322,14 @@ def evaluate(
     macro_precision = precision_score(
         all_labels,
         all_predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
     macro_recall = recall_score(
         all_labels,
         all_predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -475,7 +475,7 @@ def train_one_epoch(
     macro_f1 = f1_score(
         all_labels,
         all_predictions,
-        average="macr✓,
+        average="macr,
         zero_division=0
     )
 
@@ -569,7 +569,7 @@ def main():
         )
 
     print(
-        "\n✓ Training data contains both "
+        "\n Training data contains both "
         "arousal classes."
     )
 
@@ -828,7 +828,7 @@ def main():
         val_macro_f1 = f1_score(
             val_targets,
             val_predictions,
-            average="macr✓,
+            average="macr,
             zero_division=0
         )
 
@@ -869,7 +869,7 @@ def main():
             )
 
             print(
-                f"  ✓ Best model saved "
+                f"   Best model saved "
                 f"(epoch {epoch})"
             )
 

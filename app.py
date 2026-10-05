@@ -9,7 +9,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title="EEG Emotion Recognition",
-    page_icon="🧠",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -37,7 +37,7 @@ if "processed_features" not in st.session_state:
 if "processed_labels" not in st.session_state:
     st.session_state.processed_labels = None
 
-if "dataset_inf✓ not in st.session_state:
+if "dataset_inf not in st.session_state:
     st.session_state.dataset_info = {}
 
 
@@ -332,7 +332,7 @@ with st.sidebar:
     st.html(
         """
         <div class="sidebar-brand">
-            🧠 EEG Lab
+             EEG Lab
         </div>
 
         <div class="sidebar-subtitle">
@@ -358,7 +358,7 @@ with st.sidebar:
     st.page_link(
         "app.py",
         label="Dashboard",
-        icon="🏠",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -368,7 +368,7 @@ with st.sidebar:
     st.page_link(
         "pages/1_Upload_Dataset.py",
         label="Upload Dataset",
-        icon="📤",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -378,7 +378,7 @@ with st.sidebar:
     st.page_link(
         "pages/2_EEG_Visualization.py",
         label="EEG Visualization",
-        icon="🧠",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -388,7 +388,7 @@ with st.sidebar:
     st.page_link(
         "pages/3_Feature_Analysis.py",
         label="Feature Analysis",
-        icon="📊",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -398,7 +398,7 @@ with st.sidebar:
     st.page_link(
         "pages/4_Emotion_Prediction.py",
         label="Emotion Prediction",
-        icon="🎭",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -408,7 +408,7 @@ with st.sidebar:
     st.page_link(
         "pages/5_Model_Architecture.py",
         label="Model Architecture",
-        icon="🏗️",
+        icon="",
     )
 
     # --------------------------------------------------------
@@ -418,7 +418,7 @@ with st.sidebar:
     st.page_link(
         "pages/6_Evaluation.py",
         label="Evaluation",
-        icon="📈",
+        icon="",
     )
 
     st.divider()
@@ -435,10 +435,10 @@ with st.sidebar:
 
 st.html(
     """
-    <div class="her✓>
+    <div class="her>
 
         <div class="hero-title">
-            🧠 EEG Emotion Recognition
+             EEG Emotion Recognition
         </div>
 
         <div class="hero-subtitle">
@@ -447,11 +447,11 @@ st.html(
         </div>
 
         <div class="hero-tech">
-            DEAP &nbsp;•&nbsp;
-            SEED &nbsp;•&nbsp;
-            Differential Entropy &nbsp;•&nbsp;
-            PSD &nbsp;•&nbsp;
-            GCN &nbsp;•&nbsp;
+            DEAP &nbsp;&nbsp;
+            SEED &nbsp;&nbsp;
+            Differential Entropy &nbsp;&nbsp;
+            PSD &nbsp;&nbsp;
+            GCN &nbsp;&nbsp;
             GRU
         </div>
 
@@ -644,7 +644,7 @@ with dataset_col1:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 DEAP
+                 DEAP
             </div>
 
             <div class="dataset-text">
@@ -675,7 +675,7 @@ with dataset_col2:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 SEED
+                 SEED
             </div>
 
             <div class="dataset-text">
@@ -723,7 +723,7 @@ if st.session_state.dataset_processed:
     info = st.session_state.dataset_info
 
     st.success(
-        f"✓ {dataset_name} dataset processed successfully."
+        f" {dataset_name} dataset processed successfully."
     )
 
     status_col1, status_col2, status_col3, status_col4 = st.columns(4)
@@ -922,21 +922,21 @@ status_col1, status_col2, status_col3 = st.columns(3)
 with status_col1:
 
     st.success(
-        "✓ Dataset Processing"
+        " Dataset Processing"
     )
 
 
 with status_col2:
 
     st.success(
-        "✓ Model Evaluation"
+        " Model Evaluation"
     )
 
 
 with status_col3:
 
     st.success(
-        "✓ Interactive Dashboard"
+        " Interactive Dashboard"
     )
 
 
@@ -953,7 +953,7 @@ st.html(
 
         <br><br>
 
-        Academic Project • DEAP + SEED • GCN / GRU
+        Academic Project  DEAP + SEED  GCN / GRU
 
     </div>
     """

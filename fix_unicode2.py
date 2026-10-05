@@ -1,13 +1,13 @@
-﻿import os
+import os
 
 def clean_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
     
     original = content
-    content = content.replace('🧠\ufffd', '🧠')
-    content = content.replace('🧠\uFFFD', '🧠')
-    content = content.replace('🧠', '🧠')
+    content = content.replace('\ufffd', '')
+    content = content.replace('\uFFFD', '')
+    content = content.replace('', '')
     content = content.replace('\ufffd', ' ')
     content = content.replace('\uFFFD', ' ')
     

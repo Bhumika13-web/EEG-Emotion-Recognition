@@ -153,11 +153,11 @@ def main():
         )
 
     # ---------------------------------------------------------
-    # 8. Subject × Label
+    # 8. Subject  Label
     # ---------------------------------------------------------
 
     print("\n" + "=" * 70)
-    print("SUBJECT × LABEL")
+    print("SUBJECT  LABEL")
     print("=" * 70)
 
     for subject in unique_subjects:

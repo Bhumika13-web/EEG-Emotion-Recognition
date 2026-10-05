@@ -180,7 +180,7 @@ def normalize_deap_features(data):
     """
     Expected final representation:
 
-    trials × windows × channels × features
+    trials  windows  channels  features
 
     Example:
 
@@ -422,11 +422,11 @@ with col3:
 
     if dataset_type == "DEAP":
 
-        representation = "30 × 32 × 10"
+        representation = "30  32  10"
 
     else:
 
-        representation = "5 × 62"
+        representation = "5  62"
 
     st.metric(
         "Representation",
@@ -719,7 +719,7 @@ if dataset_type == "DEAP":
         DEAP prediction uses the trained SVM baseline models.
 
         Input:
-        30 temporal windows × 32 EEG channels × 10 features.
+        30 temporal windows  32 EEG channels  10 features.
 
         Features:
         Differential Entropy + PSD.
@@ -1064,7 +1064,7 @@ elif dataset_type == "SEED":
         SEED prediction uses the trained SVM baseline model.
 
         Input:
-        5 frequency bands × 62 EEG channels.
+        5 frequency bands  62 EEG channels.
 
         Classes:
         Negative / Neutral / Positive.

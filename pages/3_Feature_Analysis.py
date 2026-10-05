@@ -11,7 +11,7 @@ from pathlib import Path
 
 st.set_page_config(
     page_title="Feature Analysis",
-    page_icon="📊",
+    page_icon="",
     layout="wide",
 )
 
@@ -143,7 +143,7 @@ st.markdown(
 <div class="feature-header">
 
 <div class="feature-header-title">
-📊 EEG Feature Analysis
+ EEG Feature Analysis
 </div>
 
 <div class="feature-header-text">
@@ -266,7 +266,7 @@ with c4:
 
 
 st.info(
-    "Representation: 30 temporal windows × 32 EEG channels × "
+    "Representation: 30 temporal windows  32 EEG channels  "
     "10 features (5 Differential Entropy + 5 PSD)."
 )
 
@@ -361,7 +361,7 @@ with sc4:
 
     st.metric(
         "Feature Vector",
-        "32 × 10",
+        "32  10",
     )
 
 
@@ -543,11 +543,11 @@ st.plotly_chart(
 
 
 # ============================================================
-# CHANNEL × BAND HEATMAP
+# CHANNEL  BAND HEATMAP
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">Channel × Frequency Band Analysis</div>',
+    '<div class="section-title">Channel  Frequency Band Analysis</div>',
     unsafe_allow_html=True,
 )
 
@@ -584,7 +584,7 @@ heatmap = go.Figure(
 
 heatmap.update_layout(
     title=(
-        f"{feature_type} — "
+        f"{feature_type}  "
         f"Window {selected_window + 1}"
     ),
     xaxis_title="EEG Channel",
@@ -767,7 +767,7 @@ fig_emotion.add_trace(
             f"{value:.4f}"
             for value in values
         ],
-        textposition="aut✓,
+        textposition="aut,
     )
 )
 
@@ -855,5 +855,5 @@ st.dataframe(
 st.markdown("---")
 
 st.caption(
-    "Feature Analysis • DEAP • Differential Entropy + PSD"
+    "Feature Analysis  DEAP  Differential Entropy + PSD"
 )
