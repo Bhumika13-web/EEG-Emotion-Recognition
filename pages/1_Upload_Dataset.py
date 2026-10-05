@@ -543,7 +543,6 @@ def calculate_deap_window_features(
     show_spinner=False,
     max_entries=32,
 )
-@st.cache_data(show_spinner=False)
 def process_deap_subject(
     file_bytes,
 ):
@@ -858,7 +857,6 @@ def extract_deap_files(
     show_spinner=False,
     max_entries=4,
 )
-@st.cache_data(show_spinner=False)
 def load_seed_arrays(
     data_bytes,
     labels_bytes,
