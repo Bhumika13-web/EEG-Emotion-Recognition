@@ -1441,6 +1441,28 @@ elif dataset_choice == "SEED":
         key="seed_upload_files",
     )
 
+        st.markdown('### Alternatively, skip upload:')
+        if st.button("Load Demo SEED Dataset", key="demo_seed_btn"):
+            with open("demo_data/DatasetNoImage.npz", "rb") as f1, open("demo_data/LabelsNoImage.npz", "rb") as f2, open("demo_data/SubjectsNoImage.npz", "rb") as f3:
+                data_bytes = f1.read()
+                labels_bytes = f2.read()
+                subjects_bytes = f3.read()
+            
+            data_array, labels_array, subjects_array = load_seed_arrays(data_bytes, labels_bytes, subjects_bytes)
+            
+            st.session_state.processed_features = data_array
+            st.session_state.processed_labels = labels_array
+            st.session_state.processed_subject_ids = subjects_array
+            st.session_state.dataset_type = "SEED"
+            st.session_state.dataset_processed = True
+            st.session_state.processed_source = "Demo SEED dataset"
+            st.session_state.processed_filename = "demo_dataset.npz"
+            st.success("Demo SEED Dataset successfully loaded!")
+            st.rerun()
+
+        st.markdown('---')
+
+
 
     if uploaded_seed_files:
 
