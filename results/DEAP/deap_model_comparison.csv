@@ -1,0 +1,7 @@
+Model,Task,Accuracy,Balanced Accuracy,Macro F1
+SVM,Valence,0.7875,0.4961,0.4406
+CNN,Valence,0.7937,0.5,0.4425
+GCN + GRU,Valence,0.7063,0.5234,0.524
+SVM,Arousal,0.2938,0.4754,0.2904
+CNN,Arousal,0.75,0.4839,0.4286
+GCN + GRU,Arousal,0.775,0.5,0.4366

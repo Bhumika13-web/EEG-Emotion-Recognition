@@ -1,0 +1,10 @@
+[client]
+showSidebarNavigation = true
+
+[server]
+maxUploadSize = 3000
+maxMessageSize = 3000
+
+[theme]
+base = "light"
+primaryColor = "#2563eb"
