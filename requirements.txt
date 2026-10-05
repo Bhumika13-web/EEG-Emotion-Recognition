@@ -7,6 +7,3 @@ matplotlib
 plotly
 networkx
 joblib
-torch
-torch_geometric
-
