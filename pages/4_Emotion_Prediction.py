@@ -1089,3 +1089,34 @@ else:
     st.error(
         f"Unsupported dataset type: {dataset_type}"
     )
+# ============================================================
+# DOWNLOAD RESULTS
+# ============================================================
+
+st.markdown('<div class="section-title">Export Results</div>', unsafe_allow_html=True)
+
+import pandas as pd
+
+if dataset_type == "DEAP" and 'predicted_valence' in locals() and predicted_valence is not None:
+    results_df = pd.DataFrame([{
+        "Trial": trial_number,
+        "Window": window_number,
+        "Predicted_Valence": "High" if predicted_valence == 1 else "Low",
+        "Predicted_Arousal": "High" if predicted_arousal == 1 else "Low",
+        "Actual_Valence": "High" if deap_label["valence"] > 5 else "Low",
+        "Actual_Arousal": "High" if deap_label["arousal"] > 5 else "Low"
+    }])
+    csv = results_df.to_csv(index=False).encode('utf-8')
+    st.download_button("Download DEAP Prediction (CSV)", csv, "deap_prediction.csv", "text/csv")
+    
+elif dataset_type == "SEED" and 'predicted_class' in locals() and predicted_class is not None:
+    results_df = pd.DataFrame([{
+        "Sample": sample_number,
+        "Predicted_Class": predicted_class,
+        "Predicted_Emotion": predicted_emotion,
+        "Actual_Class": seed_label["class_id"],
+        "Actual_Emotion": seed_label["emotion"]
+    }])
+    csv = results_df.to_csv(index=False).encode('utf-8')
+    st.download_button("Download SEED Prediction (CSV)", csv, "seed_prediction.csv", "text/csv")
+

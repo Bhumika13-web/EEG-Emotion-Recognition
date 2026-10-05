@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import numpy as np
 import pickle
 import tempfile
@@ -14,7 +14,7 @@ from scipy.signal import butter, sosfiltfilt, welch
 
 st.set_page_config(
     page_title="Upload Dataset",
-    page_icon="🧠",
+    page_icon="ðŸ§ ",
     layout="wide",
 )
 
@@ -238,7 +238,7 @@ with dataset_col1:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 DEAP
+                ðŸ§  DEAP
             </div>
 
             <div class="dataset-text">
@@ -255,7 +255,7 @@ with dataset_col1:
                 Filtering + windowing + DE + PSD<br>
 
                 <b>Representation:</b>
-                30 windows × 32 channels × 10 features
+                30 windows Ã— 32 channels Ã— 10 features
 
             </div>
 
@@ -271,7 +271,7 @@ with dataset_col2:
         <div class="dataset-card">
 
             <div class="dataset-title">
-                🧠 SEED
+                ðŸ§  SEED
             </div>
 
             <div class="dataset-text">
@@ -289,7 +289,7 @@ with dataset_col2:
                 Validation + normalization<br>
 
                 <b>Representation:</b>
-                5 frequency bands × 62 channels
+                5 frequency bands Ã— 62 channels
 
             </div>
 
@@ -303,7 +303,7 @@ with dataset_col2:
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">Step 1 — Select Dataset</div>',
+    '<div class="section-title">Step 1 â€” Select Dataset</div>',
     unsafe_allow_html=True,
 )
 
@@ -393,10 +393,10 @@ def calculate_deap_window_features(
     Calculate DE + PSD for ONE DEAP EEG window.
 
     Input:
-        channels × samples
+        channels Ã— samples
 
     Output:
-        channels × 10
+        channels Ã— 10
 
     5 DE + 5 PSD
     """
@@ -543,6 +543,7 @@ def calculate_deap_window_features(
     show_spinner=False,
     max_entries=32,
 )
+@st.cache_data(show_spinner=False)
 def process_deap_subject(
     file_bytes,
 ):
@@ -703,7 +704,7 @@ def process_deap_subject(
             )
 
 
-            # 32 × 10 → 320
+            # 32 Ã— 10 â†’ 320
 
             flattened = (
                 window_features
@@ -749,6 +750,7 @@ def process_deap_subject(
 # FIND DEAP FILES
 # ============================================================
 
+@st.cache_data(show_spinner=False)
 def extract_deap_files(
     uploaded_files,
 ):
@@ -856,6 +858,7 @@ def extract_deap_files(
     show_spinner=False,
     max_entries=4,
 )
+@st.cache_data(show_spinner=False)
 def load_seed_arrays(
     data_bytes,
     labels_bytes,
@@ -1064,7 +1067,7 @@ def load_seed_arrays(
 if dataset_choice == "DEAP":
 
     st.markdown(
-        '<div class="section-title">Step 2 — Upload DEAP Dataset</div>',
+        '<div class="section-title">Step 2 â€” Upload DEAP Dataset</div>',
         unsafe_allow_html=True,
     )
 
@@ -1135,8 +1138,8 @@ if dataset_choice == "DEAP":
             )
 
             st.write(
-                f"📄 {file.name} "
-                f"— {size_mb:.1f} MB"
+                f"ðŸ“„ {file.name} "
+                f"â€” {size_mb:.1f} MB"
             )
 
 
@@ -1147,7 +1150,7 @@ if dataset_choice == "DEAP":
 
 
         process_deap = st.button(
-            "⚙️ Process DEAP Dataset",
+            "âš™ï¸ Process DEAP Dataset",
             type="primary",
             use_container_width=True,
             key="process_deap_button",
@@ -1345,7 +1348,7 @@ if dataset_choice == "DEAP":
 
 
                     st.success(
-                        "✓ DEAP dataset is ready."
+                        "âœ“ DEAP dataset is ready."
                     )
 
 
@@ -1382,7 +1385,7 @@ if dataset_choice == "DEAP":
 elif dataset_choice == "SEED":
 
     st.markdown(
-        '<div class="section-title">Step 2 — Upload SEED Dataset</div>',
+        '<div class="section-title">Step 2 â€” Upload SEED Dataset</div>',
         unsafe_allow_html=True,
     )
 
@@ -1402,17 +1405,17 @@ elif dataset_choice == "SEED":
                 <br><br>
 
                 <b>DatasetCaricatoNoImage.npz</b>
-                — EEG feature data
+                â€” EEG feature data
 
                 <br>
 
                 <b>LabelsNoImage.npz</b>
-                — emotion labels
+                â€” emotion labels
 
                 <br>
 
                 <b>SubjectsNoImage.npz</b>
-                — subject IDs
+                â€” subject IDs
 
                 <br><br>
 
@@ -1421,7 +1424,7 @@ elif dataset_choice == "SEED":
                 <br><br>
 
                 <b>
-                samples × 5 frequency bands × 62 channels
+                samples Ã— 5 frequency bands Ã— 62 channels
                 </b>
 
             </div>
@@ -1459,8 +1462,8 @@ elif dataset_choice == "SEED":
             )
 
             st.write(
-                f"📄 {file.name} "
-                f"— {size_mb:.1f} MB"
+                f"ðŸ“„ {file.name} "
+                f"â€” {size_mb:.1f} MB"
             )
 
 
@@ -1471,7 +1474,7 @@ elif dataset_choice == "SEED":
 
 
         process_seed = st.button(
-            "⚙️ Process SEED Dataset",
+            "âš™ï¸ Process SEED Dataset",
             type="primary",
             use_container_width=True,
             key="process_seed_button",
@@ -1715,7 +1718,7 @@ elif dataset_choice == "SEED":
 
 
                     st.success(
-                        "✓ SEED dataset is ready."
+                        "âœ“ SEED dataset is ready."
                     )
 
 
@@ -1784,7 +1787,7 @@ if st.session_state.dataset_processed:
         <div class="success-card">
 
             <div class="success-title">
-                ✓ {active_dataset} dataset is loaded
+                âœ“ {active_dataset} dataset is loaded
             </div>
 
             <div class="success-text">
